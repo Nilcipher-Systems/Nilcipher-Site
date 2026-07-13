@@ -383,19 +383,16 @@
       App:        ["Starter", "Standard", "Premium"],
       Automation: ["Starter", "Standard", "Premium"]
     };
-    // ===== STRIPE PAYMENT LINKS =====
-    // One link per bundle deposit. The amount is LOCKED on Stripe's side, so
-    // nobody can edit the price in DevTools and underpay.
-    //
-    // >>> TODO: paste your real Stripe Payment Link URLs here. <<<
-    // Create 12 links in the Stripe Dashboard (Product = the deposit amount below),
-    // then drop each URL in. Until you do, the button shows a setup warning
-    // instead of sending people to a dead link.
-    const STRIPE_LINKS = {
-      Website:    ["", "", ""],  // Starter $30.00 | Business $56.25 | Advanced $100.00
-      Bot:        ["", "", ""],  // Starter $22.50 | Standard $43.75 | Premium  $87.50
-      App:        ["", "", ""],  // Starter $32.50 | Standard $68.75 | Premium  $125.00
-      Automation: ["", "", ""]   // Starter $11.25 | Standard $27.50 | Premium  $55.00
+    // ===== BUNDLE KEYS =====
+    // These keys are just labels. The ACTUAL PRICE lives on the server in
+    // netlify/functions/_pricing.js and is looked up there at checkout time.
+    // Editing anything in this file (or in DevTools) cannot change what you're
+    // charged — the server ignores any price the browser claims.
+    const BUNDLE_KEYS = {
+      Website:    ["website-starter", "website-business", "website-advanced"],
+      Bot:        ["bot-starter", "bot-standard", "bot-premium"],
+      App:        ["app-starter", "app-standard", "app-premium"],
+      Automation: ["automation-starter", "automation-standard", "automation-premium"]
     };
 
     // ===== Browse =====
@@ -512,7 +509,7 @@
       }
     }
 
-    // ===== Submit: send the order, THEN send them straight to Stripe =====
+    // ===== Submit: create a checkout session server-side, then redirect =====
     const form = document.getElementById('order-form');
     const statusEl = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
@@ -523,65 +520,78 @@
       const service = document.getElementById('service').value;
       const idx = document.getElementById('bundle').value;
       const isCustom = service === 'Custom';
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const details = (document.querySelector('.req-block.show textarea') || {}).value || '';
+      const timeline = (document.getElementById('timeline') || {}).value || '';
 
-      // For priced bundles, make sure a Stripe link actually exists before we
-      // promise the customer a checkout page.
-      let payUrl = '';
-      if (!isCustom) {
-        if (!service || idx === '' || idx === undefined) {
-          statusEl.textContent = 'Please pick a service and bundle first.';
-          statusEl.className = 'form-status error show';
-          return;
-        }
-        payUrl = (STRIPE_LINKS[service] || [])[idx] || '';
-        if (!payUrl) {
-          statusEl.textContent = 'Payment links aren\'t configured yet. Please reach out on Discord and I\'ll invoice you directly.';
-          statusEl.className = 'form-status error show';
-          return;
-        }
+      if (!isCustom && (!service || idx === '' || idx === undefined)) {
+        statusEl.textContent = 'Please pick a service and bundle first.';
+        statusEl.className = 'form-status error show';
+        return;
       }
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Sending…';
+      submitBtn.textContent = 'Sending\u2026';
       statusEl.className = 'form-status';
 
       try {
-        const res = await fetch(form.action, {
+        // Always send the brief to Formspree so you have the order on record
+        const fd = new FormData(form);
+        await fetch(form.action, {
           method: 'POST',
-          body: new FormData(form),
+          body: fd,
           headers: { 'Accept': 'application/json' }
         });
-        if (!res.ok) throw new Error('Submit failed');
 
+        // Custom orders have no fixed price — no deposit, just a quote request.
         if (isCustom) {
-          statusEl.textContent = "Request received — I'll reach out with a quote. No deposit needed until we've scoped it.";
+          statusEl.textContent = "Request received \u2014 I'll reach out with a quote. No deposit needed until we've scoped it.";
           statusEl.className = 'form-status success show';
           form.reset();
           document.getElementById('bundle-group').style.display = 'none';
           document.querySelectorAll('.req-block').forEach(r => r.classList.remove('show'));
           document.getElementById('custom-note').classList.remove('show');
-          submitBtn.textContent = 'Sent ✓';
+          submitBtn.textContent = 'Sent \u2713';
           return;
         }
 
-        // Order is in. Hand off to Stripe's hosted checkout.
-        // Prefill their email so the payment matches the order automatically.
-        const email = document.getElementById('email').value;
-        const url = new URL(payUrl);
-        if (email) url.searchParams.set('prefilled_email', email);
+        // Ask the SERVER to build a checkout session. We send the bundle KEY,
+        // never a price — the server decides what this costs.
+        const res = await fetch('/.netlify/functions/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bundleKey: BUNDLE_KEYS[service][idx],
+            name: name,
+            email: email,
+            details: details,
+            timeline: timeline
+          })
+        });
 
-        statusEl.textContent = 'Order received — taking you to secure checkout…';
+        const data = await res.json();
+        if (!res.ok || !data.url) throw new Error(data.error || 'Checkout failed');
+
+        statusEl.textContent = 'Order received \u2014 taking you to secure checkout\u2026';
         statusEl.className = 'form-status success show';
-        submitBtn.textContent = 'Redirecting…';
-        window.location.href = url.toString();
+        submitBtn.textContent = 'Redirecting\u2026';
+        window.location.href = data.url;
 
       } catch (err) {
-        statusEl.textContent = "Something went wrong sending your order. Please try again, or reach out on Discord.";
+        statusEl.textContent = err.message || "Something went wrong. Please try again, or reach out on Discord.";
         statusEl.className = 'form-status error show';
         submitBtn.disabled = false;
         updateDeposit();
       }
     });
+
+    // If they backed out of Stripe checkout, say so rather than silently resetting
+    if (new URLSearchParams(location.search).get('canceled')) {
+      const st = document.getElementById('form-status');
+      st.textContent = 'Checkout canceled \u2014 nothing was charged. Your details are still here whenever you\'re ready.';
+      st.className = 'form-status error show';
+    }
 
     // Set the initial button state on load
     updateDeposit();
