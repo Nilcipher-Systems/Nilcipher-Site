@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Start a Project — Nilcipher Systems</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <style>
+    .start-hero { text-align: center; padding: 60px 20px 20px; position: relative; }
+    .start-hero .hero-glow {
+      position: absolute; top: 10%; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(240, 96, 62, 0.24), transparent 70%);
+      filter: blur(40px); z-index: 0;
+    }
+    .start-hero-inner { position: relative; z-index: 1; }
+    .start-logo {
+      width: 90px; border-radius: 14px; border: 1px solid rgba(240, 96, 62, 0.35);
+      padding: 5px; background: rgba(53, 25, 28, 0.5);
+      box-shadow: 0 0 30px rgba(240, 96, 62, 0.25); margin-bottom: 22px;
+    }
+    .back-link {
+      position: absolute; top: 24px; left: 30px; color: var(--muted);
+      text-decoration: none; font-size: 0.85rem; letter-spacing: 1px;
+      text-transform: uppercase; z-index: 10; transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--pink); }
+    .step-eyebrow {
+      display: inline-block; font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--red); border: 1px solid rgba(240,96,62,0.4); border-radius: 20px;
+      padding: 4px 14px; margin-bottom: 12px;
+    }
+    .category-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px; max-width: 900px; margin: 10px auto 0;
+    }
+    .cat-btn {
+      background: linear-gradient(160deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(240, 96, 62, 0.15); border-radius: 16px;
+      padding: 34px 22px; cursor: pointer; text-align: center;
+      transition: transform 0.2s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .cat-btn:hover, .cat-btn.active {
+      transform: translateY(-4px); border-color: rgba(240, 96, 62, 0.5);
+      box-shadow: 0 12px 34px rgba(0,0,0,0.4), 0 0 26px rgba(240, 96, 62, 0.14);
+    }
+    .cat-btn.active { border-color: var(--red); }
+    .cat-icon { font-size: 2rem; color: var(--red); margin-bottom: 12px; font-family: 'Consolas', monospace; }
+    .cat-btn h3 { color: var(--pink); letter-spacing: 2px; text-transform: uppercase; font-size: 1.1rem; }
+    .cat-btn p { color: var(--muted); font-size: 0.85rem; margin-top: 8px; }
+    .bundles { display: none; margin-top: 20px; }
+    .bundles.show { display: block; animation: fadeUp 0.5s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .bundle-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 22px; max-width: 950px; margin: 0 auto;
+    }
+    .bundle {
+      position: relative;
+      background: linear-gradient(160deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(240, 96, 62, 0.15); border-radius: 16px;
+      padding: 28px 24px; text-align: left;
+      transition: transform 0.2s, border-color 0.25s, box-shadow 0.25s;
+    }
+    .bundle:hover {
+      transform: translateY(-4px); border-color: rgba(240, 96, 62, 0.4);
+      box-shadow: 0 14px 36px rgba(0,0,0,0.4), 0 0 26px rgba(240, 96, 62, 0.12);
+    }
+    /* Featured (top-tier) bundle — the one we want to draw the eye */
+    .bundle.featured {
+      border-color: var(--red);
+      box-shadow: 0 0 0 1px rgba(240,96,62,0.35), 0 16px 40px rgba(0,0,0,0.45), 0 0 34px rgba(240, 96, 62, 0.2);
+    }
+    .bundle.featured:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 0 0 1px var(--red), 0 20px 48px rgba(0,0,0,0.5), 0 0 44px rgba(240, 96, 62, 0.32);
+    }
+    .bundle-badge {
+      position: absolute; top: -12px; right: 18px;
+      background: linear-gradient(90deg, var(--amber), var(--red));
+      color: #2a1418; font-size: 0.66rem; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(240, 96, 62, 0.4);
+    }
+    .bundle-name { color: var(--pink); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 1rem; }
+    .bundle-price { font-size: 2.2rem; font-weight: 800; margin: 8px 0 2px; color: var(--text); }
+    .bundle-deposit { font-size: 0.78rem; color: var(--red); margin-bottom: 14px; letter-spacing: 1px; }
+    .bundle ul { list-style: none; }
+    .bundle li { font-size: 0.88rem; color: var(--muted); padding: 5px 0; border-bottom: 1px solid rgba(240,96,62,0.1); }
+    .bundle li::before { content: "✓"; color: var(--red); font-weight: 700; margin-right: 8px; }
+
+    .form-wrap {
+      max-width: 680px; margin: 0 auto;
+      background: linear-gradient(160deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(240, 96, 62, 0.2); border-radius: 18px; padding: 40px; text-align: left;
+    }
+    .form-group { margin-bottom: 22px; }
+    .form-group label {
+      display: block; margin-bottom: 8px; font-size: 0.82rem;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--pink);
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; background: var(--bg); border: 1px solid rgba(240, 96, 62, 0.25);
+      border-radius: 8px; padding: 13px 16px; color: var(--text);
+      font-family: inherit; font-size: 0.95rem; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(240, 96, 62, 0.15);
+    }
+    .form-group textarea { resize: vertical; min-height: 110px; }
+    .form-note { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
+    .req-block { display: none; }
+    .req-block.show { display: block; }
+    .custom-note {
+      display: none; background: rgba(240,96,62,0.08); border: 1px solid rgba(240,96,62,0.3);
+      border-radius: 10px; padding: 16px; margin-bottom: 22px; font-size: 0.9rem; color: var(--text);
+    }
+    .custom-note.show { display: block; }
+    .custom-note a { color: var(--pink); font-weight: 600; text-decoration: none; }
+    .submit-btn {
+      width: 100%; background: linear-gradient(90deg, var(--amber), var(--red));
+      color: #2a1418; font-weight: 700; border: none; padding: 15px; border-radius: 8px;
+      letter-spacing: 1.5px; text-transform: uppercase; font-size: 0.9rem; cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(240, 96, 62, 0.4); }
+    .submit-btn:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: none; }
+
+    /* form status message */
+    .form-status {
+      display: none; margin-top: 18px; padding: 16px; border-radius: 10px;
+      font-size: 0.92rem; text-align: center;
+    }
+    .form-status.show { display: block; }
+    .form-status.success { background: rgba(80, 200, 120, 0.12); border: 1px solid rgba(80,200,120,0.4); color: #9fe6b8; }
+    .form-status.error { background: rgba(240, 96, 62, 0.12); border: 1px solid rgba(240,96,62,0.4); color: var(--pink); }
+
+    .deposit-display {
+      margin: 24px auto; padding: 22px; max-width: 340px;
+      border: 1px solid rgba(240,96,62,0.3); border-radius: 14px;
+      background: rgba(240,96,62,0.06);
+    }
+    .deposit-display .label { font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+    .deposit-display .picked { font-size: 0.85rem; color: var(--pink); margin-top: 4px; min-height: 1.1em; }
+    .deposit-display .amount { font-size: 2.6rem; font-weight: 800; color: var(--pink); margin-top: 6px; }
+    .deposit-display .amount.empty { font-size: 1.05rem; color: var(--muted); font-weight: 500; }
+    .deposit-display .deposit-rest {
+      font-size: 0.78rem; color: var(--muted); margin-top: 6px; min-height: 1em;
+    }
+    .secure-note {
+      font-size: 0.78rem; color: var(--muted); text-align: center;
+      margin-top: 14px; line-height: 1.5;
+    }
+
+    .action-card {
+      max-width: 680px; margin: 0 auto;
+      background: linear-gradient(160deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(240, 96, 62, 0.15); border-radius: 16px; padding: 30px 26px; text-align: center;
+    }
+    .action-card h3 { color: var(--pink); letter-spacing: 1px; margin-bottom: 10px; }
+    .action-card p { color: var(--muted); font-size: 0.9rem; margin-bottom: 20px; }
+    .discord-btn {
+      display: inline-block; background: #5865F2; color: #fff; text-decoration: none;
+      padding: 13px 28px; border-radius: 8px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; font-size: 0.82rem; transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .discord-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4); }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <a href="index.html" class="back-link">← Back</a>
+
+  <header class="start-hero">
+    <div class="hero-glow"></div>
+    <div class="start-hero-inner">
+      <img src="assets/logo.png" alt="Nilcipher Systems" class="start-logo">
+      <h1>Start a Project</h1>
+      <p class="tagline">Browse · Submit · Pay your deposit</p>
+    </div>
+  </header>
+
+  <!-- BROWSE -->
+  <section class="section reveal">
+    <h2>What do you need?</h2>
+    <p class="about-text">Choose a service to see its bundles and pricing.</p>
+    <div class="category-grid">
+      <div class="cat-btn" onclick="showCategory('websites', this)">
+        <div class="cat-icon">&lt;/&gt;</div><h3>Websites</h3><p>Custom, responsive sites</p>
+      </div>
+      <div class="cat-btn" onclick="showCategory('bots', this)">
+        <div class="cat-icon">⬢</div><h3>Bots</h3><p>Discord bots &amp; automation</p>
+      </div>
+      <div class="cat-btn" onclick="showCategory('apps', this)">
+        <div class="cat-icon">▦</div><h3>Apps</h3><p>Backend &amp; full-stack apps</p>
+      </div>
+      <div class="cat-btn" onclick="showCategory('automation', this)">
+        <div class="cat-icon">⚙</div><h3>Automation</h3><p>Scripts &amp; workflows</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUNDLES -->
+  <section class="section bundles" id="bundles-websites">
+    <h2>Website Bundles</h2>
+    <div class="bundle-grid">
+      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$120</div><div class="bundle-deposit">Deposit: $30</div><ul><li>1-page site</li><li>Fully responsive</li><li>Contact form</li><li>You own the code</li></ul></div>
+      <div class="bundle"><div class="bundle-name">Business</div><div class="bundle-price">$225</div><div class="bundle-deposit">Deposit: $56.25</div><ul><li>Up to 4 pages</li><li>Custom design</li><li>Light SEO</li><li>Opt-in form</li></ul></div>
+      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Advanced</div><div class="bundle-price">$400</div><div class="bundle-deposit">Deposit: $100</div><ul><li>6+ pages</li><li>Custom animations</li><li>Speed + SEO</li><li>The full package</li></ul></div>
+    </div>
+  </section>
+
+  <section class="section bundles" id="bundles-bots">
+    <h2>Bot Bundles</h2>
+    <div class="bundle-grid">
+      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$90</div><div class="bundle-deposit">Deposit: $22.50</div><ul><li>Basic Discord bot</li><li>A few core commands</li><li>One main feature</li><li>Setup included</li></ul></div>
+      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$175</div><div class="bundle-deposit">Deposit: $43.75</div><ul><li>Moderation + roles</li><li>Database-backed</li><li>Multiple features</li><li>Slash commands</li></ul></div>
+      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$350</div><div class="bundle-deposit">Deposit: $87.50</div><ul><li>Full custom bot</li><li>Tiered access control</li><li>Dashboard / panels</li><li>Ongoing structure</li></ul></div>
+    </div>
+  </section>
+
+  <section class="section bundles" id="bundles-apps">
+    <h2>App Bundles</h2>
+    <div class="bundle-grid">
+      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$130</div><div class="bundle-deposit">Deposit: $32.50</div><ul><li>Simple app or script</li><li>Single core function</li><li>Clean, documented code</li><li>You own it</li></ul></div>
+      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$275</div><div class="bundle-deposit">Deposit: $68.75</div><ul><li>Multi-feature app</li><li>Database integration</li><li>API connections</li><li>Testing included</li></ul></div>
+      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$500</div><div class="bundle-deposit">Deposit: $125</div><ul><li>Full-stack build</li><li>Complex logic</li><li>Custom architecture</li><li>Deployment support</li></ul></div>
+    </div>
+  </section>
+
+  <section class="section bundles" id="bundles-automation">
+    <h2>Automation Bundles</h2>
+    <div class="bundle-grid">
+      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$45</div><div class="bundle-deposit">Deposit: $11.25</div><ul><li>Single script</li><li>One task automated</li><li>Clean, reusable code</li><li>Setup notes</li></ul></div>
+      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$110</div><div class="bundle-deposit">Deposit: $27.50</div><ul><li>Multi-step workflow</li><li>Scheduled runs</li><li>Error handling</li><li>Documentation</li></ul></div>
+      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$220</div><div class="bundle-deposit">Deposit: $55</div><ul><li>Complex system</li><li>Multiple integrations</li><li>Monitoring / logging</li><li>Ongoing reliability</li></ul></div>
+    </div>
+  </section>
+
+  <!-- ORDER + DEPOSIT (single combined step) -->
+  <section class="section reveal">
+    <span class="step-eyebrow">Order &amp; Deposit</span>
+    <h2>Start Your Build</h2>
+    <p class="about-text">Tell me what you need, then pay your deposit — one step, one click.</p>
+    <div class="form-wrap">
+      <form id="order-form" action="https://formspree.io/f/mojogvnd" method="POST">
+        <div class="form-group">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="service">Service</label>
+          <select id="service" name="service" onchange="onServiceChange()">
+            <option value="">Select a service…</option>
+            <option value="Website">Website</option>
+            <option value="Bot">Bot</option>
+            <option value="App">App</option>
+            <option value="Automation">Automation</option>
+            <option value="Custom">Custom Order</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="bundle-group" style="display:none;">
+          <label for="bundle">Bundle</label>
+          <select id="bundle" name="bundle" onchange="onBundleChange()"></select>
+        </div>
+
+        <div class="custom-note" id="custom-note">
+          Custom orders aren't a fixed bundle — every one is different.
+          Please <a href="https://discord.gg/5Mp6TrUCq" target="_blank">DM me on Discord</a>
+          to talk through what you need and get a quote. You can still submit this form
+          with the details and I'll reach out.
+        </div>
+
+        <div class="req-block" id="req-Website">
+          <div class="form-group">
+            <label for="web-req">Website details</label>
+            <textarea id="web-req" name="website_details" placeholder="Pages needed, purpose, style/references. Do you have your logo, images, and text ready? (I build sites — assets must be provided.)"></textarea>
+          </div>
+        </div>
+        <div class="req-block" id="req-Bot">
+          <div class="form-group">
+            <label for="bot-req">Bot details</label>
+            <textarea id="bot-req" name="bot_details" placeholder="Platform (Discord?), what features/commands you need, do you have a server, any existing bot to modify?"></textarea>
+          </div>
+        </div>
+        <div class="req-block" id="req-App">
+          <div class="form-group">
+            <label for="app-req">App details</label>
+            <textarea id="app-req" name="app_details" placeholder="What should the app do? Web or desktop? Any existing code, data, or APIs to work with?"></textarea>
+          </div>
+        </div>
+        <div class="req-block" id="req-Automation">
+          <div class="form-group">
+            <label for="auto-req">Automation details</label>
+            <textarea id="auto-req" name="automation_details" placeholder="What task to automate? What tools/services are involved? How often should it run?"></textarea>
+          </div>
+        </div>
+        <div class="req-block" id="req-Custom">
+          <div class="form-group">
+            <label for="custom-req">Custom project details</label>
+            <textarea id="custom-req" name="custom_details" placeholder="Describe what you're looking for in as much detail as you can — I'll follow up with a quote."></textarea>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="timeline">Timeline (optional)</label>
+          <input type="text" id="timeline" name="timeline" placeholder="e.g. 'within 2 weeks'">
+        </div>
+
+        <!-- Auto-filled pricing breakdown (sent with the order email) -->
+        <input type="hidden" id="hidden-bundle"    name="Bundle selected">
+        <input type="hidden" id="hidden-total"     name="Total price">
+        <input type="hidden" id="hidden-deposit"   name="Deposit due now (25%)">
+        <input type="hidden" id="hidden-remaining" name="Remaining balance (75%)">
+
+        <!-- Live deposit summary — updates as they pick a bundle -->
+        <div class="deposit-display" id="deposit-box">
+          <div class="label">Deposit Due Today (25%)</div>
+          <div class="picked" id="deposit-picked"></div>
+          <div class="amount empty" id="deposit-amount">Select a bundle above</div>
+          <div class="deposit-rest" id="deposit-rest"></div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submit-btn">Select a Bundle to Continue</button>
+        <p class="secure-note">
+          Secure checkout via Stripe. Your order is sent to me and you're taken
+          straight to payment — no second step, no manual amounts.
+        </p>
+        <div class="form-status" id="form-status"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section reveal">
+    <h2>Questions First?</h2>
+    <p class="about-text">Not sure which bundle fits, or want a custom quote? Reach out — happy to help.</p>
+    <div class="contact-buttons">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nilcipher.dev@gmail.com" target="_blank" class="btn">Email Me</a>
+      <a href="https://discord.gg/5Mp6TrUCq" target="_blank" class="btn btn-outline">Discord</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>© 2026 Nilcipher Systems · Code. Automate. Elevate.</p>
+  </footer>
+
+  <script>
+    // ===== Data =====
+    const BUNDLES = {
+      Website:    ["Starter ($120)", "Business ($225)", "Advanced ($400)"],
+      Bot:        ["Starter ($90)", "Standard ($175)", "Premium ($350)"],
+      App:        ["Starter ($130)", "Standard ($275)", "Premium ($500)"],
+      Automation: ["Starter ($45)", "Standard ($110)", "Premium ($220)"]
+    };
+    const DEPOSITS = {
+      Website:    ["$30.00", "$56.25", "$100.00"],
+      Bot:        ["$22.50", "$43.75", "$87.50"],
+      App:        ["$32.50", "$68.75", "$125.00"],
+      Automation: ["$11.25", "$27.50", "$55.00"]
+    };
+    // Numeric totals (used to compute the deposit / remaining breakdown for the order email)
+    const PRICES = {
+      Website:    [120, 225, 400],
+      Bot:        [90, 175, 350],
+      App:        [130, 275, 500],
+      Automation: [45, 110, 220]
+    };
+    const BUNDLE_LABELS = {
+      Website:    ["Starter", "Business", "Advanced"],
+      Bot:        ["Starter", "Standard", "Premium"],
+      App:        ["Starter", "Standard", "Premium"],
+      Automation: ["Starter", "Standard", "Premium"]
+    };
+    // ===== STRIPE PAYMENT LINKS =====
+    // One link per bundle deposit. The amount is LOCKED on Stripe's side, so
+    // nobody can edit the price in DevTools and underpay.
+    //
+    // >>> TODO: paste your real Stripe Payment Link URLs here. <<<
+    // Create 12 links in the Stripe Dashboard (Product = the deposit amount below),
+    // then drop each URL in. Until you do, the button shows a setup warning
+    // instead of sending people to a dead link.
+    const STRIPE_LINKS = {
+      Website:    ["", "", ""],  // Starter $30.00 | Business $56.25 | Advanced $100.00
+      Bot:        ["", "", ""],  // Starter $22.50 | Standard $43.75 | Premium  $87.50
+      App:        ["", "", ""],  // Starter $32.50 | Standard $68.75 | Premium  $125.00
+      Automation: ["", "", ""]   // Starter $11.25 | Standard $27.50 | Premium  $55.00
+    };
+
+    // ===== Browse =====
+    function showCategory(cat, el) {
+      document.querySelectorAll('.bundles').forEach(b => b.classList.remove('show'));
+      document.querySelectorAll('.cat-btn').forEach(c => c.classList.remove('active'));
+      document.getElementById('bundles-' + cat).classList.add('show');
+      el.classList.add('active');
+      document.getElementById('bundles-' + cat).scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // ===== Step 1: service change =====
+    function onServiceChange() {
+      const val = document.getElementById('service').value;
+      const bundleGroup = document.getElementById('bundle-group');
+      const bundleSelect = document.getElementById('bundle');
+      const customNote = document.getElementById('custom-note');
+
+      document.querySelectorAll('.req-block').forEach(r => r.classList.remove('show'));
+      if (val) {
+        const block = document.getElementById('req-' + val);
+        if (block) block.classList.add('show');
+      }
+      customNote.classList.toggle('show', val === 'Custom');
+
+      if (BUNDLES[val]) {
+        bundleSelect.innerHTML = '<option value="">Select a bundle…</option>' +
+          BUNDLES[val].map((b, i) => `<option value="${i}">${b}</option>`).join('');
+        bundleGroup.style.display = 'block';
+      } else {
+        bundleGroup.style.display = 'none';
+        bundleSelect.innerHTML = '';
+      }
+
+      updateHiddenPricing();
+      updateDeposit();
+    }
+
+    function onBundleChange() {
+      updateHiddenPricing();
+      updateDeposit();
+    }
+
+    // Fill the hidden fields so the order email includes the exact price breakdown
+    function updateHiddenPricing() {
+      const service = document.getElementById('service').value;
+      const idx = document.getElementById('bundle').value;
+      const fmt = (n) => '$' + n.toFixed(2);
+
+      const set = (id, val) => { document.getElementById(id).value = val; };
+
+      if (service === 'Custom') {
+        set('hidden-bundle', 'Custom Order — quote to be discussed');
+        set('hidden-total', 'TBD (custom quote)');
+        set('hidden-deposit', 'TBD (25% of final quote)');
+        set('hidden-remaining', 'TBD (remaining 75%)');
+        return;
+      }
+
+      if (service && PRICES[service] && idx !== '' && idx !== undefined) {
+        const total = PRICES[service][idx];
+        const deposit = total * 0.25;
+        const remaining = total - deposit;
+        set('hidden-bundle', service + ' — ' + BUNDLE_LABELS[service][idx] + ' (' + fmt(total) + ')');
+        set('hidden-total', fmt(total));
+        set('hidden-deposit', fmt(deposit));
+        set('hidden-remaining', fmt(remaining));
+      } else {
+        set('hidden-bundle', '');
+        set('hidden-total', '');
+        set('hidden-deposit', '');
+        set('hidden-remaining', '');
+      }
+    }
+
+    // ===== Live deposit summary + button state =====
+    function updateDeposit() {
+      const service = document.getElementById('service').value;
+      const idx = document.getElementById('bundle').value;
+      const amountEl = document.getElementById('deposit-amount');
+      const pickedEl = document.getElementById('deposit-picked');
+      const restEl = document.getElementById('deposit-rest');
+      const box = document.getElementById('deposit-box');
+      const btn = document.getElementById('submit-btn');
+
+      // Custom orders have no fixed price — no deposit can be taken up front.
+      if (service === 'Custom') {
+        box.style.display = 'none';
+        btn.textContent = 'Send Custom Request';
+        btn.disabled = false;
+        return;
+      }
+      box.style.display = 'block';
+
+      const ready = service && DEPOSITS[service] && idx !== '' && idx !== undefined;
+
+      if (ready) {
+        const total = PRICES[service][idx];
+        const deposit = total * 0.25;
+        amountEl.textContent = DEPOSITS[service][idx];
+        amountEl.classList.remove('empty');
+        pickedEl.textContent = service + ' — ' + BUNDLE_LABELS[service][idx] +
+                               ' ($' + total.toFixed(2) + ' total)';
+        restEl.textContent = '$' + (total - deposit).toFixed(2) + ' remaining, due on completion';
+        btn.textContent = 'Submit & Pay ' + DEPOSITS[service][idx] + ' Deposit';
+        btn.disabled = false;
+      } else {
+        amountEl.textContent = 'Select a bundle above';
+        amountEl.classList.add('empty');
+        pickedEl.textContent = '';
+        restEl.textContent = '';
+        btn.textContent = 'Select a Bundle to Continue';
+        btn.disabled = true;
+      }
+    }
+
+    // ===== Submit: send the order, THEN send them straight to Stripe =====
+    const form = document.getElementById('order-form');
+    const statusEl = document.getElementById('form-status');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const service = document.getElementById('service').value;
+      const idx = document.getElementById('bundle').value;
+      const isCustom = service === 'Custom';
+
+      // For priced bundles, make sure a Stripe link actually exists before we
+      // promise the customer a checkout page.
+      let payUrl = '';
+      if (!isCustom) {
+        if (!service || idx === '' || idx === undefined) {
+          statusEl.textContent = 'Please pick a service and bundle first.';
+          statusEl.className = 'form-status error show';
+          return;
+        }
+        payUrl = (STRIPE_LINKS[service] || [])[idx] || '';
+        if (!payUrl) {
+          statusEl.textContent = 'Payment links aren\'t configured yet. Please reach out on Discord and I\'ll invoice you directly.';
+          statusEl.className = 'form-status error show';
+          return;
+        }
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+      statusEl.className = 'form-status';
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json' }
+        });
+        if (!res.ok) throw new Error('Submit failed');
+
+        if (isCustom) {
+          statusEl.textContent = "Request received — I'll reach out with a quote. No deposit needed until we've scoped it.";
+          statusEl.className = 'form-status success show';
+          form.reset();
+          document.getElementById('bundle-group').style.display = 'none';
+          document.querySelectorAll('.req-block').forEach(r => r.classList.remove('show'));
+          document.getElementById('custom-note').classList.remove('show');
+          submitBtn.textContent = 'Sent ✓';
+          return;
+        }
+
+        // Order is in. Hand off to Stripe's hosted checkout.
+        // Prefill their email so the payment matches the order automatically.
+        const email = document.getElementById('email').value;
+        const url = new URL(payUrl);
+        if (email) url.searchParams.set('prefilled_email', email);
+
+        statusEl.textContent = 'Order received — taking you to secure checkout…';
+        statusEl.className = 'form-status success show';
+        submitBtn.textContent = 'Redirecting…';
+        window.location.href = url.toString();
+
+      } catch (err) {
+        statusEl.textContent = "Something went wrong sending your order. Please try again, or reach out on Discord.";
+        statusEl.className = 'form-status error show';
+        submitBtn.disabled = false;
+        updateDeposit();
+      }
+    });
+
+    // Set the initial button state on load
+    updateDeposit();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
