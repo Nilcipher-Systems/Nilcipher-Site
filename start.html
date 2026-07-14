@@ -167,6 +167,99 @@
       text-transform: uppercase; font-size: 0.82rem; transition: transform 0.18s, box-shadow 0.18s;
     }
     .discord-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4); }
+
+    /* ===== Expandable bundle cards ===== */
+    .bundle-card {
+      background: linear-gradient(160deg, var(--surface), var(--surface-2));
+      border: 1px solid rgba(240, 96, 62, 0.15); border-radius: 14px;
+      margin-bottom: 14px; overflow: hidden; transition: border-color 0.25s;
+      text-align: left;
+    }
+    .bundle-card:hover { border-color: rgba(240, 96, 62, 0.4); }
+    .bundle-head {
+      width: 100%; background: none; border: none; cursor: pointer;
+      padding: 22px 24px; color: var(--text); font-family: inherit;
+      display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .bundle-head-left { text-align: left; }
+    .bundle-head h4 {
+      font-size: 1.15rem; color: var(--pink); letter-spacing: 1px; margin-bottom: 4px;
+    }
+    .bundle-head .sum { font-size: 0.85rem; color: var(--muted); font-weight: 400; }
+    .bundle-head-right { text-align: right; flex-shrink: 0; }
+    .bundle-head .price {
+      font-size: 1.5rem; font-weight: 700; color: var(--text); display: block;
+    }
+    .bundle-head .dep { font-size: 0.72rem; color: var(--red); letter-spacing: 1px; }
+    .bundle-head .chev {
+      color: var(--red); font-size: 1.2rem; transition: transform 0.25s;
+      margin-left: 10px; display: inline-block;
+    }
+    .bundle-card.open .chev { transform: rotate(45deg); }
+    .bundle-body {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease, padding 0.35s ease;
+      padding: 0 24px;
+    }
+    .bundle-card.open .bundle-body { max-height: 700px; padding: 0 24px 24px; }
+    .bundle-body ul { list-style: none; padding: 0; margin: 0 0 16px; }
+    .bundle-body li {
+      color: var(--muted); font-size: 0.92rem; padding: 7px 0 7px 26px;
+      position: relative; line-height: 1.5;
+    }
+    .bundle-body li::before {
+      content: '\2713'; position: absolute; left: 0; top: 7px;
+      color: var(--red); font-weight: 700;
+    }
+    .bundle-meta {
+      display: flex; gap: 20px; flex-wrap: wrap;
+      padding-top: 14px; border-top: 1px solid rgba(240, 96, 62, 0.15);
+      font-size: 0.78rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase;
+    }
+    .bundle-meta strong { color: var(--pink); }
+
+    /* ===== Image upload ===== */
+    .upload-zone {
+      border: 2px dashed rgba(240, 96, 62, 0.3); border-radius: 12px;
+      padding: 26px; text-align: center; cursor: pointer;
+      transition: border-color 0.2s, background 0.2s; background: rgba(53, 25, 28, 0.3);
+    }
+    .upload-zone:hover, .upload-zone.drag {
+      border-color: var(--red); background: rgba(240, 96, 62, 0.07);
+    }
+    .upload-zone .ico { font-size: 1.6rem; color: var(--red); margin-bottom: 8px; }
+    .upload-zone p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+    .upload-zone .hint { font-size: 0.75rem; margin-top: 6px; opacity: 0.75; }
+    #file-input { display: none; }
+    .thumbs { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .thumb {
+      position: relative; width: 76px; height: 76px; border-radius: 8px;
+      overflow: hidden; border: 1px solid rgba(240, 96, 62, 0.3);
+    }
+    .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .thumb button {
+      position: absolute; top: 2px; right: 2px; width: 20px; height: 20px;
+      border-radius: 50%; border: none; cursor: pointer; line-height: 1;
+      background: rgba(20, 8, 10, 0.85); color: var(--pink); font-size: 0.9rem;
+    }
+    .thumb button:hover { background: var(--red); color: #fff; }
+
+    /* ===== Terms acceptance ===== */
+    .terms-box {
+      background: rgba(53, 25, 28, 0.55);
+      border: 1px solid rgba(240, 96, 62, 0.25); border-radius: 12px;
+      padding: 18px 20px; margin: 26px 0 6px;
+      display: flex; align-items: flex-start; gap: 13px;
+    }
+    .terms-box.missing {
+      border-color: var(--red); box-shadow: 0 0 0 3px rgba(240, 96, 62, 0.14);
+    }
+    .terms-box input[type="checkbox"] {
+      width: 20px; height: 20px; margin-top: 2px; flex-shrink: 0;
+      accent-color: var(--red); cursor: pointer;
+    }
+    .terms-box label { color: var(--muted); font-size: 0.9rem; line-height: 1.6; cursor: pointer; }
+    .terms-box a { color: var(--pink); text-decoration: underline; }
+    .terms-box a:hover { color: var(--amber); }
   </style>
 </head>
 <body>
@@ -206,41 +299,30 @@
     </div>
   </section>
 
-  <!-- BUNDLES -->
+
+  <!-- BUNDLES — rendered from BUNDLES data, expandable -->
   <section class="section bundles" id="bundles-websites">
     <h2>Website Bundles</h2>
-    <div class="bundle-grid">
-      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$120</div><div class="bundle-deposit">Deposit: $30</div><ul><li>1-page site</li><li>Fully responsive</li><li>Contact form</li><li>You own the code</li></ul></div>
-      <div class="bundle"><div class="bundle-name">Business</div><div class="bundle-price">$225</div><div class="bundle-deposit">Deposit: $56.25</div><ul><li>Up to 4 pages</li><li>Custom design</li><li>Light SEO</li><li>Opt-in form</li></ul></div>
-      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Advanced</div><div class="bundle-price">$400</div><div class="bundle-deposit">Deposit: $100</div><ul><li>6+ pages</li><li>Custom animations</li><li>Speed + SEO</li><li>The full package</li></ul></div>
-    </div>
+    <p class="about-text">Tap any bundle to see exactly what's included.</p>
+    <div class="bundle-list" id="list-Website"></div>
   </section>
 
   <section class="section bundles" id="bundles-bots">
     <h2>Bot Bundles</h2>
-    <div class="bundle-grid">
-      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$90</div><div class="bundle-deposit">Deposit: $22.50</div><ul><li>Basic Discord bot</li><li>A few core commands</li><li>One main feature</li><li>Setup included</li></ul></div>
-      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$175</div><div class="bundle-deposit">Deposit: $43.75</div><ul><li>Moderation + roles</li><li>Database-backed</li><li>Multiple features</li><li>Slash commands</li></ul></div>
-      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$350</div><div class="bundle-deposit">Deposit: $87.50</div><ul><li>Full custom bot</li><li>Tiered access control</li><li>Dashboard / panels</li><li>Ongoing structure</li></ul></div>
-    </div>
+    <p class="about-text">Tap any bundle to see exactly what's included.</p>
+    <div class="bundle-list" id="list-Bot"></div>
   </section>
 
   <section class="section bundles" id="bundles-apps">
     <h2>App Bundles</h2>
-    <div class="bundle-grid">
-      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$130</div><div class="bundle-deposit">Deposit: $32.50</div><ul><li>Simple app or script</li><li>Single core function</li><li>Clean, documented code</li><li>You own it</li></ul></div>
-      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$275</div><div class="bundle-deposit">Deposit: $68.75</div><ul><li>Multi-feature app</li><li>Database integration</li><li>API connections</li><li>Testing included</li></ul></div>
-      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$500</div><div class="bundle-deposit">Deposit: $125</div><ul><li>Full-stack build</li><li>Complex logic</li><li>Custom architecture</li><li>Deployment support</li></ul></div>
-    </div>
+    <p class="about-text">Tap any bundle to see exactly what's included.</p>
+    <div class="bundle-list" id="list-App"></div>
   </section>
 
   <section class="section bundles" id="bundles-automation">
     <h2>Automation Bundles</h2>
-    <div class="bundle-grid">
-      <div class="bundle"><div class="bundle-name">Starter</div><div class="bundle-price">$45</div><div class="bundle-deposit">Deposit: $11.25</div><ul><li>Single script</li><li>One task automated</li><li>Clean, reusable code</li><li>Setup notes</li></ul></div>
-      <div class="bundle"><div class="bundle-name">Standard</div><div class="bundle-price">$110</div><div class="bundle-deposit">Deposit: $27.50</div><ul><li>Multi-step workflow</li><li>Scheduled runs</li><li>Error handling</li><li>Documentation</li></ul></div>
-      <div class="bundle featured"><div class="bundle-badge">Best value</div><div class="bundle-name">Premium</div><div class="bundle-price">$220</div><div class="bundle-deposit">Deposit: $55</div><ul><li>Complex system</li><li>Multiple integrations</li><li>Monitoring / logging</li><li>Ongoing reliability</li></ul></div>
-    </div>
+    <p class="about-text">Tap any bundle to see exactly what's included.</p>
+    <div class="bundle-list" id="list-Automation"></div>
   </section>
 
   <!-- ORDER + DEPOSIT (single combined step) -->
@@ -277,7 +359,7 @@
 
         <div class="custom-note" id="custom-note">
           Custom orders aren't a fixed bundle — every one is different.
-          Please <a href="https://discord.gg/5Mp6TrUCq" target="_blank">DM me on Discord</a>
+          Please <a href="https://discord.gg/8pCxntAvD" target="_blank">DM me on Discord</a>
           to talk through what you need and get a quote. You can still submit this form
           with the details and I'll reach out.
         </div>
@@ -324,12 +406,33 @@
         <input type="hidden" id="hidden-deposit"   name="Deposit due now (25%)">
         <input type="hidden" id="hidden-remaining" name="Remaining balance (75%)">
 
+        <!-- Concept image upload -->
+        <div class="form-group">
+          <label>Concept images (optional)</label>
+          <div class="upload-zone" id="upload-zone">
+            <div class="ico">&#128247;</div>
+            <p>Click or drag images here</p>
+            <p class="hint">Mockups, sketches, references, screenshots &mdash; anything that shows me what you're picturing.<br>PNG, JPG, GIF, WEBP &middot; up to 5 files &middot; 5MB each</p>
+          </div>
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/gif,image/webp" multiple>
+          <div class="thumbs" id="thumbs"></div>
+        </div>
+
         <!-- Live deposit summary — updates as they pick a bundle -->
         <div class="deposit-display" id="deposit-box">
           <div class="label">Deposit Due Today (25%)</div>
           <div class="picked" id="deposit-picked"></div>
           <div class="amount empty" id="deposit-amount">Select a bundle above</div>
           <div class="deposit-rest" id="deposit-rest"></div>
+        </div>
+
+        <div class="terms-box" id="terms-box">
+          <input type="checkbox" id="terms-check" name="terms_accepted">
+          <label for="terms-check">
+            I've read and agree to the <a href="terms.html" target="_blank">Project Terms</a> &mdash;
+            including scope, revisions, the 25% deposit being non-refundable once work begins,
+            and what happens if either of us goes quiet mid-build.
+          </label>
         </div>
 
         <button type="submit" class="submit-btn" id="submit-btn">Select a Bundle to Continue</button>
@@ -348,7 +451,7 @@
     <p class="about-text">Not sure which bundle fits, or want a custom quote? Reach out — happy to help.</p>
     <div class="contact-buttons">
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=nilcipher.dev@gmail.com" target="_blank" class="btn">Email Me</a>
-      <a href="https://discord.gg/5Mp6TrUCq" target="_blank" class="btn btn-outline">Discord</a>
+      <a href="https://discord.gg/8pCxntAvD" target="_blank" class="btn btn-outline">Discord</a>
     </div>
   </section>
 
@@ -357,44 +460,362 @@
   </footer>
 
   <script>
-    // ===== Data =====
+    // ===== BUNDLE DATA (display only) =====
+    // The REAL prices live server-side in netlify/functions/_pricing.js.
+    // Editing anything here (or in DevTools) cannot change what you're charged.
     const BUNDLES = {
-      Website:    ["Starter ($120)", "Business ($225)", "Advanced ($400)"],
-      Bot:        ["Starter ($90)", "Standard ($175)", "Premium ($350)"],
-      App:        ["Starter ($130)", "Standard ($275)", "Premium ($500)"],
-      Automation: ["Starter ($45)", "Standard ($110)", "Premium ($220)"]
-    };
-    const DEPOSITS = {
-      Website:    ["$30.00", "$56.25", "$100.00"],
-      Bot:        ["$22.50", "$43.75", "$87.50"],
-      App:        ["$32.50", "$68.75", "$125.00"],
-      Automation: ["$11.25", "$27.50", "$55.00"]
-    };
-    // Numeric totals (used to compute the deposit / remaining breakdown for the order email)
-    const PRICES = {
-      Website:    [120, 225, 400],
-      Bot:        [90, 175, 350],
-      App:        [130, 275, 500],
-      Automation: [45, 110, 220]
-    };
-    const BUNDLE_LABELS = {
-      Website:    ["Starter", "Business", "Advanced"],
-      Bot:        ["Starter", "Standard", "Premium"],
-      App:        ["Starter", "Standard", "Premium"],
-      Automation: ["Starter", "Standard", "Premium"]
-    };
-    // ===== BUNDLE KEYS =====
-    // These keys are just labels. The ACTUAL PRICE lives on the server in
-    // netlify/functions/_pricing.js and is looked up there at checkout time.
-    // Editing anything in this file (or in DevTools) cannot change what you're
-    // charged — the server ignores any price the browser claims.
-    const BUNDLE_KEYS = {
-      Website:    ["website-starter", "website-business", "website-advanced"],
-      Bot:        ["bot-starter", "bot-standard", "bot-premium"],
-      App:        ["app-starter", "app-standard", "app-premium"],
-      Automation: ["automation-starter", "automation-standard", "automation-premium"]
-    };
+      "Website": [
+            {
+                  "name": "Starter",
+                  "price": 275,
+                  "timeline": "~3-4 days",
+                  "summary": "A sharp one-page site. Perfect for a portfolio or a first web presence.",
+                  "features": [
+                        "Single-page responsive site (mobile, tablet, desktop)",
+                        "Up to 3 content sections",
+                        "Contact form wired to your email",
+                        "Deployed live with SSL",
+                        "Full source code, yours to keep",
+                        "1 round of revisions"
+                  ]
+            },
+            {
+                  "name": "Business",
+                  "price": 850,
+                  "timeline": "~2 weeks",
+                  "summary": "A multi-page site for a business that needs to convert visitors.",
+                  "features": [
+                        "Everything in Starter",
+                        "Up to 6 distinct pages",
+                        "Custom animations and scroll interactions",
+                        "Blog or gallery system",
+                        "Google Analytics integration",
+                        "Performance tuning (fast load scores)",
+                        "Social media integration",
+                        "3 rounds of revisions"
+                  ]
+            },
+            {
+                  "name": "Advanced",
+                  "price": 1900,
+                  "timeline": "~4 weeks",
+                  "summary": "A site with a backend \u2014 payments, logins, dashboards, real logic.",
+                  "features": [
+                        "Everything in Business",
+                        "Unlimited pages",
+                        "Backend / serverless functions",
+                        "Stripe payment integration (like this very site)",
+                        "User accounts and authentication",
+                        "Admin dashboard to manage content",
+                        "Database integration",
+                        "Third-party API integrations",
+                        "30 days of post-launch support",
+                        "Unlimited revisions during the build"
+                  ]
+            }
+      ],
+      "Bot": [
+            {
+                  "name": "Starter",
+                  "price": 180,
+                  "timeline": "~2-3 days",
+                  "summary": "A simple bot that nails a handful of jobs.",
+                  "features": [
+                        "Up to 5 custom slash commands",
+                        "Core moderation (kick, ban, warn, purge)",
+                        "Welcome / goodbye messages",
+                        "Hosting setup guide included",
+                        "Full source code, yours to keep",
+                        "1 round of revisions"
+                  ]
+            },
+            {
+                  "name": "Standard",
+                  "price": 700,
+                  "timeline": "~1.5 weeks",
+                  "summary": "A bot with a memory \u2014 logs, records, and persistent data.",
+                  "features": [
+                        "Everything in Starter",
+                        "Up to 20 custom slash commands",
+                        "SQLite database (infractions, user records, logs)",
+                        "Interactive buttons, dropdowns, and modals",
+                        "Role assignment panels",
+                        "Automod triggers and filters",
+                        "Scheduled and recurring tasks",
+                        "Logging channels for every action",
+                        "3 rounds of revisions"
+                  ]
+            },
+            {
+                  "name": "Premium",
+                  "price": 1500,
+                  "timeline": "~3 weeks",
+                  "summary": "A full platform \u2014 tiered permissions, dashboards, external APIs.",
+                  "features": [
+                        "Everything in Standard",
+                        "Unlimited commands",
+                        "Tiered permission system (staff ranks, access levels)",
+                        "Web dashboard to configure the bot",
+                        "External API integrations (Twitch, YouTube, payments, etc.)",
+                        "Ticket / support system",
+                        "Economy, leveling, or custom game mechanics",
+                        "Multi-server support",
+                        "24/7 hosting setup and deployment",
+                        "30 days of post-launch support"
+                  ]
+            }
+      ],
+      "App": [
+            {
+                  "name": "Starter",
+                  "price": 400,
+                  "timeline": "~1 week",
+                  "summary": "A working tool that solves one problem properly.",
+                  "features": [
+                        "Single-purpose application (web or desktop)",
+                        "Clean, functional UI",
+                        "Local data storage",
+                        "One core feature, built to your spec",
+                        "Full source code and setup docs",
+                        "1 round of revisions"
+                  ]
+            },
+            {
+                  "name": "Standard",
+                  "price": 1200,
+                  "timeline": "~2.5 weeks",
+                  "summary": "A real application with a backend and users.",
+                  "features": [
+                        "Everything in Starter",
+                        "Backend API",
+                        "Database (SQLite or Postgres)",
+                        "User accounts and authentication",
+                        "Multi-screen interface",
+                        "Third-party API integration",
+                        "Deployment to live hosting",
+                        "3 rounds of revisions"
+                  ]
+            },
+            {
+                  "name": "Premium",
+                  "price": 2100,
+                  "timeline": "~4-5 weeks",
+                  "summary": "Production-grade software. The whole thing, built properly.",
+                  "features": [
+                        "Everything in Standard",
+                        "Full-stack production application",
+                        "Admin panel and role-based permissions",
+                        "Payment processing (Stripe)",
+                        "Real-time features (websockets, live updates)",
+                        "Automated testing",
+                        "CI/CD pipeline \u2014 push to deploy",
+                        "Scalable architecture",
+                        "30 days of post-launch support",
+                        "Unlimited revisions during the build"
+                  ]
+            }
+      ],
+      "Automation": [
+            {
+                  "name": "Starter",
+                  "price": 125,
+                  "timeline": "~1-2 days",
+                  "summary": "Kill one repetitive task. The cheapest way to get your time back.",
+                  "features": [
+                        "Single automation script",
+                        "One task automated end to end",
+                        "Plain-English setup instructions",
+                        "Full source code",
+                        "1 round of revisions"
+                  ]
+            },
+            {
+                  "name": "Standard",
+                  "price": 450,
+                  "timeline": "~1 week",
+                  "summary": "A multi-step workflow that runs itself.",
+                  "features": [
+                        "Everything in Starter",
+                        "Multi-step workflow automation",
+                        "API integrations (connect your tools together)",
+                        "Web scraping / data collection",
+                        "Error handling and retry logic",
+                        "Email or Discord notifications on completion",
+                        "Run logs so you can see what happened and when",
+                        "3 rounds of revisions"
+                  ]
+            },
+            {
+                  "name": "Premium",
+                  "price": 1000,
+                  "timeline": "~2 weeks",
+                  "summary": "A full pipeline. Set it up once, never think about it again.",
+                  "features": [
+                        "Everything in Standard",
+                        "Full data pipeline (ingest, transform, store, report)",
+                        "Database integration",
+                        "Custom dashboard to monitor runs",
+                        "Cloud deployment (runs without your computer on)",
+                        "Alerting and monitoring",
+                        "Automated reports",
+                        "30 days of post-launch support"
+                  ]
+            }
+      ]
+};
 
+    const BUNDLE_KEYS = {
+      "Website": [
+            "website-starter",
+            "website-business",
+            "website-advanced"
+      ],
+      "Bot": [
+            "bot-starter",
+            "bot-standard",
+            "bot-premium"
+      ],
+      "App": [
+            "app-starter",
+            "app-standard",
+            "app-premium"
+      ],
+      "Automation": [
+            "automation-starter",
+            "automation-standard",
+            "automation-premium"
+      ]
+};
+
+    const PRICES = {};
+    const DEPOSITS = {};
+    const BUNDLE_LABELS = {};
+    for (const cat in BUNDLES) {
+      PRICES[cat] = BUNDLES[cat].map(b => b.price);
+      DEPOSITS[cat] = BUNDLES[cat].map(b => '$' + (b.price * 0.25).toFixed(2));
+      BUNDLE_LABELS[cat] = BUNDLES[cat].map(b => b.name);
+    }
+
+    // ===== Render expandable bundle cards from the data =====
+    function renderBundles() {
+      for (const cat in BUNDLES) {
+        const host = document.getElementById('list-' + cat);
+        if (!host) continue;
+        host.innerHTML = BUNDLES[cat].map((b, i) => `
+          <div class="bundle-card">
+            <button type="button" class="bundle-head" onclick="toggleBundle(this)">
+              <span class="bundle-head-left">
+                <h4>${b.name}</h4>
+                <span class="sum">${b.summary}</span>
+              </span>
+              <span class="bundle-head-right">
+                <span class="price">$${b.price.toLocaleString()}</span>
+                <span class="dep">$${(b.price * 0.25).toFixed(2)} deposit</span>
+                <span class="chev">+</span>
+              </span>
+            </button>
+            <div class="bundle-body">
+              <ul>${b.features.map(f => `<li>${f}</li>`).join('')}</ul>
+              <div class="bundle-meta">
+                <span>Timeline: <strong>${b.timeline}</strong></span>
+                <span>Then <strong>$${(b.price * 0.75).toFixed(2)}</strong> on delivery</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    function toggleBundle(btn) {
+      btn.parentElement.classList.toggle('open');
+    }
+
+    // ===== Concept image upload =====
+    // Files are held in memory and only uploaded on submit, so someone who
+    // abandons the form never costs us storage.
+    let pendingFiles = [];
+    const MAX_FILES = 5;
+    const MAX_BYTES = 5 * 1024 * 1024;
+    const OK_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+
+    const zone = document.getElementById('upload-zone');
+    const fileInput = document.getElementById('file-input');
+    const thumbs = document.getElementById('thumbs');
+
+    zone.addEventListener('click', () => fileInput.click());
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag'));
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      zone.classList.remove('drag');
+      addFiles(e.dataTransfer.files);
+    });
+    fileInput.addEventListener('change', () => addFiles(fileInput.files));
+
+    function addFiles(list) {
+      const st = document.getElementById('form-status');
+      for (const f of list) {
+        if (pendingFiles.length >= MAX_FILES) {
+          st.textContent = `Maximum ${MAX_FILES} images.`;
+          st.className = 'form-status error show';
+          break;
+        }
+        if (!OK_TYPES.includes(f.type)) {
+          st.textContent = `"${f.name}" isn't a supported image (PNG, JPG, GIF, WEBP).`;
+          st.className = 'form-status error show';
+          continue;
+        }
+        if (f.size > MAX_BYTES) {
+          st.textContent = `"${f.name}" is over 5MB.`;
+          st.className = 'form-status error show';
+          continue;
+        }
+        pendingFiles.push(f);
+      }
+      fileInput.value = '';
+      drawThumbs();
+    }
+
+    function drawThumbs() {
+      thumbs.innerHTML = '';
+      pendingFiles.forEach((f, i) => {
+        const d = document.createElement('div');
+        d.className = 'thumb';
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(f);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        const x = document.createElement('button');
+        x.type = 'button';
+        x.textContent = '\u00d7';
+        x.onclick = () => { pendingFiles.splice(i, 1); drawThumbs(); };
+        d.appendChild(img); d.appendChild(x);
+        thumbs.appendChild(d);
+      });
+    }
+
+    function fileToDataUrl(f) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result);
+        r.onerror = rej;
+        r.readAsDataURL(f);
+      });
+    }
+
+    async function uploadConcepts() {
+      if (!pendingFiles.length) return [];
+      const files = await Promise.all(
+        pendingFiles.map(async f => ({ name: f.name, data: await fileToDataUrl(f) }))
+      );
+      const res = await fetch('/.netlify/functions/upload-concept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ files })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Image upload failed.');
+      return data.keys || [];
+    }
     // ===== Browse =====
     function showCategory(cat, el) {
       document.querySelectorAll('.bundles').forEach(b => b.classList.remove('show'));
@@ -524,10 +945,22 @@
       const email = document.getElementById('email').value;
       const details = (document.querySelector('.req-block.show textarea') || {}).value || '';
       const timeline = (document.getElementById('timeline') || {}).value || '';
+      const termsOk = document.getElementById('terms-check').checked;
 
       if (!isCustom && (!service || idx === '' || idx === undefined)) {
         statusEl.textContent = 'Please pick a service and bundle first.';
         statusEl.className = 'form-status error show';
+        return;
+      }
+
+      // Terms gate. Also enforced SERVER-SIDE — this is just the friendly version.
+      if (!isCustom && !termsOk) {
+        const box = document.getElementById('terms-box');
+        box.classList.add('missing');
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        statusEl.textContent = 'Please read and accept the project terms before paying a deposit.';
+        statusEl.className = 'form-status error show';
+        setTimeout(() => box.classList.remove('missing'), 2500);
         return;
       }
 
@@ -556,8 +989,16 @@
           return;
         }
 
+        // Upload any concept images first, so their keys ride along with the payment.
+        let conceptKeys = [];
+        if (pendingFiles.length) {
+          submitBtn.textContent = 'Uploading images\u2026';
+          conceptKeys = await uploadConcepts();
+        }
+
         // Ask the SERVER to build a checkout session. We send the bundle KEY,
         // never a price — the server decides what this costs.
+        submitBtn.textContent = 'Sending\u2026';
         const res = await fetch('/.netlify/functions/create-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -566,7 +1007,9 @@
             name: name,
             email: email,
             details: details,
-            timeline: timeline
+            timeline: timeline,
+            termsAccepted: termsOk,
+            conceptKeys: conceptKeys
           })
         });
 
@@ -593,7 +1036,8 @@
       st.className = 'form-status error show';
     }
 
-    // Set the initial button state on load
+    // Render bundle cards + set initial button state
+    renderBundles();
     updateDeposit();
   </script>
   <script src="script.js"></script>

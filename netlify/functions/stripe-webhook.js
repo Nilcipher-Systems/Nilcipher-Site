@@ -63,6 +63,16 @@ exports.handler = async (event) => {
     console.log('Remaining:  $', m.remaining_usd);
     console.log('Timeline:   ', m.timeline || '(none given)');
     console.log('Details:    ', m.project_details);
+    console.log('Terms:      ', m.terms_accepted === 'yes'
+      ? `ACCEPTED ${m.terms_accepted_at}` : '*** NOT ACCEPTED ***');
+    if (m.concept_images) {
+      const keys = m.concept_images.split(',').filter(Boolean);
+      console.log('Concepts:   ', keys.length + ' image(s) attached');
+      keys.forEach(k => console.log('             - ' + k));
+      console.log('             (fetch from the "concepts" blob store)');
+    } else {
+      console.log('Concepts:    none attached');
+    }
     console.log('Session:    ', session.id);
     console.log('====================');
 

@@ -35,7 +35,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request.' }) };
   }
 
-  const { bundleKey, name, email, details, timeline } = payload;
+  const { bundleKey, name, email, details, timeline, termsAccepted, conceptKeys } = payload;
 
   // --- Validate the bundle against the server catalog ---
   const item = getBundle(bundleKey);
@@ -43,6 +43,17 @@ exports.handler = async (event) => {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: 'Unknown bundle. Please pick a bundle and try again.' })
+    };
+  }
+
+  // --- Terms must be accepted. Enforced HERE, not just in the browser.
+  // A checkbox in the DOM is a courtesy; this is the actual gate. Without
+  // this, someone could POST straight at the endpoint and skip the contract,
+  // which would undermine the whole point of having one.
+  if (termsAccepted !== true) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'You must accept the project terms before paying a deposit.' })
     };
   }
 
@@ -88,7 +99,10 @@ exports.handler = async (event) => {
         remaining_usd: (item.remainingCents / 100).toFixed(2),
         customer_name: clip(name, 200),
         project_details: clip(details, 480),
-        timeline: clip(timeline, 100)
+        timeline: clip(timeline, 100),
+        concept_images: Array.isArray(conceptKeys) ? conceptKeys.slice(0, 5).join(',') : '',
+        terms_accepted: 'yes',
+        terms_accepted_at: new Date().toISOString()
       },
 
       success_url: `${siteUrl}/success.html?session_id={CHECKOUT_SESSION_ID}`,
