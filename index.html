@@ -182,32 +182,54 @@
   <!-- ===== PROJECTS ===== -->
   <section id="projects" class="section reveal">
     <h2>Projects</h2>
+    <p class="about-text">
+      Real things I've built. Not mockups, not tutorials &mdash; software that runs.
+    </p>
     <div class="grid">
       <div class="card project-card">
+        <div class="card-icon">&#9670;</div>
         <h3>MonitorBot</h3>
-        <p>Premium Discord moderation bot — slash commands, tiered access,
-           infraction records, role panels.</p>
-        <span class="tag">discord.py · SQLite</span>
+        <p>A Discord moderation platform with tiered staff permissions, persistent
+           infraction records, role panels, and full slash-command support. Built for
+           servers that outgrew the free bots.</p>
+        <span class="tag">discord.py &middot; SQLite</span>
       </div>
       <div class="card project-card">
+        <div class="card-icon">&#9650;</div>
         <h3>dTrading</h3>
-        <p>Algorithmic trading bot with modular strategy engine, backtesting,
-           and live streaming data.</p>
-        <span class="tag">Python · Alpaca API</span>
+        <p>An algorithmic trading bot with a modular strategy engine, historical
+           backtesting, and live market data streaming. Swap strategies without
+           touching the core.</p>
+        <span class="tag">Python &middot; Alpaca API</span>
       </div>
       <div class="card project-card">
+        <div class="card-icon">&lt;/&gt;</div>
         <h3>This Site</h3>
-        <p>Hand-coded portfolio — no frameworks, no builders. Just HTML, CSS,
-           and JavaScript.</p>
-        <span class="tag">HTML · CSS · JS</span>
+        <p>Hand-coded. No frameworks, no builders, no templates. The order form you'd
+           use to hire me runs on a real backend with server-validated pricing and
+           Stripe webhooks &mdash; the same stack I'd build for you.</p>
+        <span class="tag">JS &middot; Serverless &middot; Stripe</span>
       </div>
     </div>
+    <p class="about-text" style="margin-top:34px; font-size:0.95rem">
+      Every one of these started as someone saying <em>"can you build&hellip;"</em>
+    </p>
+    <a href="start.html" class="btn">Start Yours</a>
   </section>
 
   <!-- ===== REVIEWS ===== -->
   <section id="reviews" class="section reveal">
     <h2>Reviews</h2>
-    <p class="about-text">Feedback from real clients — coming soon.</p>
+    <p class="about-text">
+      I'm new, and I'd rather say that plainly than fake a wall of testimonials.
+      No reviews here yet &mdash; when real clients say real things, this is where
+      they'll go.
+    </p>
+    <p class="about-text" style="font-size:0.95rem">
+      Until then, judge me on the work. <a href="#projects" style="color:var(--pink)">The
+      projects are above</a>, and this entire site &mdash; backend, payments, and all
+      &mdash; is something I built. That's the sample.
+    </p>
   </section>
 
   <!-- ===== CONTACT ===== -->
@@ -245,32 +267,52 @@
   <!-- ===== FAQ ===== -->
   <section id="faq" class="section reveal">
     <h2>FAQ</h2>
+    <p class="about-text">The things people actually ask before hiring me.</p>
     <div class="faq-list">
       <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">Do you design logos or graphics?<span class="icon">+</span></button>
-        <div class="faq-a">No — I focus on building. Please have your logo, images, and any visual assets ready. I bring the code; you bring the branding.</div>
+        <button class="faq-q" onclick="toggleFaq(this)">How much does this actually cost?<span class="icon">+</span></button>
+        <div class="faq-a">Bundles start at <strong>$125</strong> for a single automation script and run up to <strong>$2,100</strong> for a full production app. A one-page portfolio site is $275. You pay 25% to start, the rest on delivery &mdash; so the automation script is $31.25 down. Every bundle lists exactly what's included on the <a href="start.html" style="color:var(--pink)">Start a Project</a> page.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Do I really own what you build?<span class="icon">+</span></button>
+        <div class="faq-a">Yes &mdash; completely, and permanently. Full source code, no subscriptions, no license fees, no lock-in. You can modify it, resell it, or hand it to another developer. I keep the right to reuse generic engineering (helper functions, boilerplate, general techniques) in other projects, but never your business logic, branding, content, or data. The <a href="terms.html" style="color:var(--pink)">Project Terms</a> spell out exactly where that line sits.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What if I don't know exactly what I want yet?<span class="icon">+</span></button>
+        <div class="faq-a">That's normal, and it's fine. Pick the closest bundle, or choose <strong>Custom Order</strong> and describe the problem instead of the solution. I'll tell you what it'd actually take. No deposit needed until we've scoped it and agreed on a number.</div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">How does payment work?<span class="icon">+</span></button>
-        <div class="faq-a">A 25% deposit gets your project started. The remaining 75% is due on completion, before final delivery. Payments run through Stripe — secure card checkout, and you get a receipt for every payment. The deposit covers the work already underway, so it's non-refundable once the build starts.</div>
+        <div class="faq-a">25% deposit to start, 75% on completion before final delivery. Secure card checkout through Stripe, receipt for every payment. The deposit is non-refundable once work begins &mdash; it covers time I've set aside for you and turned down other work to protect. If you cancel before I start, you get it back.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">Do I own the finished work?<span class="icon">+</span></button>
-        <div class="faq-a">Yes, completely. You receive the full source code and own everything I build for you — no subscriptions, no lock-in.</div>
+        <button class="faq-q" onclick="toggleFaq(this)">What happens if you disappear halfway through?<span class="icon">+</span></button>
+        <div class="faq-a">You get a full refund. It's written into the <a href="terms.html" style="color:var(--pink)">terms</a> &mdash; if I go silent for 14 days without warning you, your deposit comes back, no argument, and you keep whatever's been built. Fair goes both ways: the same terms cover what happens if <em>you</em> go quiet.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">What do you need from me to start?<span class="icon">+</span></button>
-        <div class="faq-a">Your project details, plus any assets (logo, images, text, existing code). The more you share up front, the faster and smoother the build.</div>
+        <button class="faq-q" onclick="toggleFaq(this)">How long does it take?<span class="icon">+</span></button>
+        <div class="faq-a">Anywhere from 1&ndash;2 days for a starter automation script to 4&ndash;5 weeks for a full production app. Every bundle shows its timeline. If you're on a deadline, tell me up front and I'll be honest about whether it's doable.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">Can you do something outside the bundles?<span class="icon">+</span></button>
-        <div class="faq-a">Absolutely. Choose "Custom Order" on the Start a Project page or DM me on Discord, and we'll scope it out and set a fair quote.</div>
+        <button class="faq-q" onclick="toggleFaq(this)">Do you design logos or graphics?<span class="icon">+</span></button>
+        <div class="faq-a">No &mdash; I build. Bring your logo, images, and visual assets and I'll bring the code. If you don't have branding yet, get that sorted first; it's cheaper than paying me to guess.</div>
       </div>
       <div class="faq-item">
-        <button class="faq-q" onclick="toggleFaq(this)">What if I need changes after delivery?<span class="icon">+</span></button>
-        <div class="faq-a">Just reach out. Revisions are included during the project, and I offer ongoing support for tweaks and updates down the line. I don't disappear after delivery.</div>
+        <button class="faq-q" onclick="toggleFaq(this)">Can you work with code I already have?<span class="icon">+</span></button>
+        <div class="faq-a">Yes. Send it over, existing codebases are fine. I'll work with what's there rather than insisting on a rewrite &mdash; unless the rewrite is genuinely the cheaper path, in which case I'll tell you that and let you decide.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">What if something breaks after delivery?<span class="icon">+</span></button>
+        <div class="faq-a">If it doesn't work the way we agreed it would, that's a bug and I fix it free. Bundles with post-launch support cover 30 days of that. New features and changes after delivery are new work, quoted separately. Either way, I don't vanish after the last payment.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Can you build something outside the bundles?<span class="icon">+</span></button>
+        <div class="faq-a">Absolutely, and often that's the better call. Pick <strong>Custom Order</strong> or DM me on Discord and describe what you're after. We'll scope it and I'll quote you a fair number.</div>
       </div>
     </div>
+    <p class="about-text" style="margin-top:34px; font-size:0.95rem">
+      Still wondering something? Ask me on Discord &mdash; I answer.
+    </p>
   </section>
 
   <!-- ===== FOOTER ===== -->

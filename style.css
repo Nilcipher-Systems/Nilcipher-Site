@@ -272,7 +272,7 @@ h1 {
   max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease;
   color: var(--muted); font-size: 0.95rem; padding: 0 24px;
 }
-.faq-item.open .faq-a { max-height: 300px; padding: 0 24px 20px; }
+.faq-item.open .faq-a { max-height: 500px; padding: 0 24px 20px; }
 
 /* ===== Contact ===== */
 .contact-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
