@@ -29,7 +29,7 @@ const esc = (s) => String(s == null ? '' : s)
  * Returns true on success, false on failure — never throws, so a
  * mail outage can't break a webhook or a checkout.
  */
-async function sendEmail({ subject, html, replyTo }) {
+async function sendEmail({ subject, html, replyTo, attachments }) {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL;
   const from = process.env.FROM_EMAIL || 'onboarding@resend.dev';
@@ -46,6 +46,7 @@ async function sendEmail({ subject, html, replyTo }) {
     html
   };
   if (replyTo) body.reply_to = replyTo;   // so you can reply straight to the client
+  if (attachments && attachments.length) body.attachments = attachments;
 
   try {
     const res = await fetch('https://api.resend.com/emails', {
@@ -147,11 +148,9 @@ async function sendPaidEmail(session, m) {
       : '<span style="color:#b91c1c">NOT ACCEPTED — investigate</span>']
   ];
 
-  const imgs = (m.concept_images || '').split(' | ').filter(Boolean);
-  rows.push(['Concept images', imgs.length
-    ? imgs.map((u, i) =>
-        `<a href="${esc(u)}" style="color:#166534">Image ${i + 1}</a>`).join(' &middot; ') +
-      `<br><span style="color:#999;font-size:11px">Hosted on Stripe — click to view</span>`
+  rows.push(['Concept images', m.concept_images
+    ? `${esc(m.concept_images)}<br><span style="color:#999;font-size:11px">` +
+      `Check for the "CONCEPT IMAGES" email from this client</span>`
     : '<em>none attached</em>']);
 
   const go = `
@@ -168,7 +167,49 @@ async function sendPaidEmail(session, m) {
   });
 }
 
-module.exports = { sendEmail, sendLeadEmail, sendPaidEmail };
+/**
+ * Concept images, attached directly to an email. Sent when the order is placed.
+ *
+ * Why email attachments and not a storage bucket: the images are small, and the
+ * only person who ever needs them is you. Netlify Blobs throws
+ * MissingBlobsEnvironmentError on plenty of correctly-configured sites, and
+ * Stripe's file API has fussy purpose/format rules. An attachment has neither
+ * problem and no service to configure.
+ *
+ * NOTE: this fires at ORDER time, before payment clears — it has to, because
+ * that's the only moment the image bytes exist. It's clearly labelled as such.
+ * The PAID email is still your signal to start work.
+ */
+async function sendConceptImages(o) {
+  const rows = [
+    ['Client', esc(o.name)],
+    ['Email', esc(o.email)],
+    ['Package', `${esc(o.service)} — ${esc(o.bundle)}`],
+    ['Images', `${o.images.length} attached to this email`]
+  ];
+  if (o.skipped && o.skipped.length) {
+    rows.push(['Skipped', `<span style="color:#b45309">` +
+      o.skipped.map(x => esc(x)).join('<br>') + `</span>`]);
+  }
+
+  const note = `
+    <div style="padding:14px 22px;background:#eff6ff;
+                border-top:1px solid #bfdbfe;color:#1e40af;font-size:13px">
+      <strong>Concept images from an order in progress.</strong> These arrive when
+      the order is submitted, before payment clears. Wait for the
+      <strong>DEPOSIT PAID</strong> email before starting work — but the mockups
+      will already be here when it lands.
+    </div>`;
+
+  return sendEmail({
+    subject: `Concepts — ${o.service} ${o.bundle} — ${o.name}`,
+    html: shell('#1e3a8a', 'CONCEPT IMAGES', rows, note),
+    replyTo: o.email,
+    attachments: o.images   // [{ filename, content: base64 }]
+  });
+}
+
+module.exports = { sendEmail, sendLeadEmail, sendPaidEmail, sendConceptImages };
 
 // ============================================================
 // SETUP — 10 minutes, one time

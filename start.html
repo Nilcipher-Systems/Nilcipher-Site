@@ -746,8 +746,10 @@
     // abandons the form never costs us storage.
     let pendingFiles = [];
     const MAX_FILES = 5;
-    const MAX_BYTES = 5 * 1024 * 1024;
+    const MAX_BYTES = 5 * 1024 * 1024;        // per image
+    const MAX_TOTAL = 15 * 1024 * 1024;       // across all images
     const OK_TYPES = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    const mb = (b) => (b / 1024 / 1024).toFixed(1) + 'MB';
 
     const zone = document.getElementById('upload-zone');
     const fileInput = document.getElementById('file-input');
@@ -777,7 +779,13 @@
           continue;
         }
         if (f.size > MAX_BYTES) {
-          st.textContent = `"${f.name}" is over 5MB.`;
+          st.textContent = `"${f.name}" is ${mb(f.size)} — the limit is 5MB per image.`;
+          st.className = 'form-status error show';
+          continue;
+        }
+        const total = pendingFiles.reduce((n, x) => n + x.size, 0);
+        if (total + f.size > MAX_TOTAL) {
+          st.textContent = `"${f.name}" would push you past the 15MB total. Remove an image or use a smaller file.`;
           st.className = 'form-status error show';
           continue;
         }

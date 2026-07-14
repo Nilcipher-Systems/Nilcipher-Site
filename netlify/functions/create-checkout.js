@@ -13,6 +13,7 @@
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { getBundle } = require('./_pricing');
+const { sendConceptImages } = require('./_email');
 
 // Real image magic numbers. The declared MIME type is attacker-controlled and
 // worthless — check the actual bytes.
@@ -24,55 +25,67 @@ const SIGS = [
 ];
 const sniff = (buf) => SIGS.find(s => s.bytes.every((b, i) => buf[i] === b)) || null;
 
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 5 * 1024 * 1024;        // 5 MB per image
+const MAX_TOTAL = 15 * 1024 * 1024;       // 15 MB across all images
 const MAX_FILES = 5;
+// Resend's message ceiling is ~40MB, and base64 inflates bytes by ~33%.
+// 15MB of raw image -> ~20MB encoded, comfortably inside it.
 
 /**
- * Upload concept images to Stripe as hosted files and return public URLs.
+ * Validate concept images and return them ready to attach to an email.
  *
- * Why Stripe and not Netlify Blobs: Blobs throws MissingBlobsEnvironmentError
- * on plenty of correctly-configured sites (it's a well-known, still-open issue).
- * Stripe is already a hard dependency here — if it's down, checkout is down
- * anyway. One less thing that can silently break.
+ * Design note: images are emailed to you directly as ATTACHMENTS rather than
+ * stored anywhere. No Netlify Blobs (throws MissingBlobsEnvironmentError on
+ * plenty of correct setups), no Stripe file API (finicky purpose/format rules),
+ * no S3 bucket to configure. The images are small, they only ever go to one
+ * person — you — so a storage layer is pure overhead and pure risk.
  *
- * Never throws: if an image fails, we skip it and keep the order. Losing a
- * mockup is annoying; losing the sale is worse.
+ * Validation is on the ACTUAL BYTES. A .exe renamed to .png gets rejected.
  */
-async function uploadImages(images) {
-  const urls = [];
-  if (!Array.isArray(images) || !images.length) return urls;
+function validateImages(images) {
+  const out = [];
+  const skipped = [];
+  let total = 0;
+  if (!Array.isArray(images)) return { out, skipped };
 
   for (const img of images.slice(0, MAX_FILES)) {
-    try {
-      if (!img || typeof img.data !== 'string') continue;
+    const label = (img && img.name) ? String(img.name).slice(0, 60) : 'image';
 
-      const comma = img.data.indexOf(',');
-      const b64 = comma >= 0 ? img.data.slice(comma + 1) : img.data;
-      const buf = Buffer.from(b64, 'base64');
-
-      if (!buf.length || buf.length > MAX_BYTES) continue;
-
-      const sig = sniff(buf);   // validate ACTUAL BYTES, not the claimed type
-      if (!sig) continue;
-
-      const file = await stripe.files.create({
-        purpose: 'business_logo',   // generic image purpose; accepts png/jpg/gif/webp
-        file: {
-          data: buf,
-          name: `concept.${sig.ext}`,
-          type: sig.mime
-        }
-      });
-
-      const link = await stripe.fileLinks.create({ file: file.id });
-      if (link.url) urls.push(link.url);
-
-    } catch (err) {
-      console.error('Concept image skipped:', err.message);
-      // keep going — one bad image must not kill the order
+    if (!img || typeof img.data !== 'string') {
+      skipped.push(`${label} (malformed)`);
+      continue;
     }
+
+    const comma = img.data.indexOf(',');
+    const b64 = comma >= 0 ? img.data.slice(comma + 1) : img.data;
+    const buf = Buffer.from(b64, 'base64');
+
+    if (!buf.length) {
+      skipped.push(`${label} (empty)`);
+      continue;
+    }
+    if (buf.length > MAX_BYTES) {
+      skipped.push(`${label} (over 5MB)`);
+      continue;
+    }
+    if (total + buf.length > MAX_TOTAL) {
+      skipped.push(`${label} (would exceed the 15MB total)`);
+      continue;
+    }
+
+    const sig = sniff(buf);
+    if (!sig) {
+      skipped.push(`${label} (not a real image)`);
+      continue;
+    }
+
+    total += buf.length;
+    out.push({
+      filename: `concept-${out.length + 1}.${sig.ext}`,
+      content: b64
+    });
   }
-  return urls;
+  return { out, skipped };
 }
 
 exports.handler = async (event) => {
@@ -131,9 +144,25 @@ exports.handler = async (event) => {
 
   const siteUrl = process.env.URL || 'https://nilciphersystems.com';
 
-  // Upload concept images to Stripe. Failures are swallowed inside — a bad
-  // mockup never blocks a paying customer.
-  const imageUrls = await uploadImages(images);
+  // Validate concept images. If they sent any, email them to you right now as
+  // attachments — tagged as an ORDER STARTED heads-up. When the PAID email
+  // lands you'll already have the mockups sitting in your inbox.
+  //
+  // Fire-and-forget: a mail failure must never block a paying customer.
+  const { out: concepts, skipped } = validateImages(images);
+
+  if (skipped.length) {
+    console.warn('Concept images skipped:', skipped.join(', '));
+  }
+  if (concepts.length) {
+    sendConceptImages({
+      name, email,
+      service: item.service,
+      bundle: item.bundle,
+      images: concepts,
+      skipped
+    }).catch(err => console.error('Concept email failed:', err.message));
+  }
 
   try {
     const session = await stripe.checkout.sessions.create({
@@ -165,7 +194,8 @@ exports.handler = async (event) => {
         customer_name: clip(name, 200),
         project_details: clip(details, 480),
         timeline: clip(timeline, 100),
-        concept_images: imageUrls.join(' | ').slice(0, 480),
+        concept_images: concepts.length ? `${concepts.length} emailed to you at order time` : '',
+        concepts_skipped: skipped.length ? String(skipped.length) : '',
         terms_accepted: 'yes',
         terms_accepted_at: new Date().toISOString()
       },

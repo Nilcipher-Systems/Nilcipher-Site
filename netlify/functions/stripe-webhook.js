@@ -71,13 +71,7 @@ exports.handler = async (event) => {
     console.log('Terms:      ', m.terms_accepted === 'yes'
       ? `ACCEPTED ${m.terms_accepted_at}` : '*** NOT ACCEPTED ***');
 
-    const imgs = (m.concept_images || '').split(' | ').filter(Boolean);
-    if (imgs.length) {
-      console.log('Concepts:   ', imgs.length + ' image(s), hosted on Stripe');
-      imgs.forEach(u => console.log('              ' + u));
-    } else {
-      console.log('Concepts:    none attached');
-    }
+    console.log('Concepts:   ', m.concept_images || 'none attached');
     console.log('Session:    ', session.id);
     console.log('=========================================');
 
