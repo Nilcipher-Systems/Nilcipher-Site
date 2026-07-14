@@ -840,8 +840,13 @@
       customNote.classList.toggle('show', val === 'Custom');
 
       if (BUNDLES[val]) {
+        // BUNDLES entries are objects ({name, price, ...}), not strings — so read
+        // the fields explicitly. Interpolating the object directly gives
+        // "[object Object]", which is exactly the bug this replaced.
         bundleSelect.innerHTML = '<option value="">Select a bundle…</option>' +
-          BUNDLES[val].map((b, i) => `<option value="${i}">${b}</option>`).join('');
+          BUNDLES[val].map((b, i) =>
+            `<option value="${i}">${b.name} — $${b.price.toLocaleString()} ($${(b.price * 0.25).toFixed(2)} deposit)</option>`
+          ).join('');
         bundleGroup.style.display = 'block';
       } else {
         bundleGroup.style.display = 'none';
