@@ -46,6 +46,24 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'A valid email is required.' }) };
   }
 
+  // ONLY email for CUSTOM quote requests.
+  //
+  // Custom orders have no fixed price, so there's no deposit to pay — this
+  // email is the ONLY way you'd ever hear about them. Miss it and you lose a
+  // real client who was actively trying to hire you.
+  //
+  // Bundle orders are different: if they pay, the webhook sends you a PAID
+  // email. If they abandon checkout, there's nothing to act on. Emailing you
+  // about abandoned carts is noise, and a notification you must ignore trains
+  // you to ignore notifications.
+  if (lead.service !== 'Custom') {
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sent: false, skipped: 'bundle order — PAID email will follow if they pay' })
+    };
+  }
+
   const ok = await sendLeadEmail(lead);
 
   // Even if the email failed, don't block the customer's checkout.

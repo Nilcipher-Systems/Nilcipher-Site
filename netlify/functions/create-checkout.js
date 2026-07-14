@@ -14,6 +14,67 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { getBundle } = require('./_pricing');
 
+// Real image magic numbers. The declared MIME type is attacker-controlled and
+// worthless — check the actual bytes.
+const SIGS = [
+  { ext: 'png',  mime: 'image/png',  bytes: [0x89, 0x50, 0x4E, 0x47] },
+  { ext: 'jpg',  mime: 'image/jpeg', bytes: [0xFF, 0xD8, 0xFF] },
+  { ext: 'gif',  mime: 'image/gif',  bytes: [0x47, 0x49, 0x46, 0x38] },
+  { ext: 'webp', mime: 'image/webp', bytes: [0x52, 0x49, 0x46, 0x46] }
+];
+const sniff = (buf) => SIGS.find(s => s.bytes.every((b, i) => buf[i] === b)) || null;
+
+const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_FILES = 5;
+
+/**
+ * Upload concept images to Stripe as hosted files and return public URLs.
+ *
+ * Why Stripe and not Netlify Blobs: Blobs throws MissingBlobsEnvironmentError
+ * on plenty of correctly-configured sites (it's a well-known, still-open issue).
+ * Stripe is already a hard dependency here — if it's down, checkout is down
+ * anyway. One less thing that can silently break.
+ *
+ * Never throws: if an image fails, we skip it and keep the order. Losing a
+ * mockup is annoying; losing the sale is worse.
+ */
+async function uploadImages(images) {
+  const urls = [];
+  if (!Array.isArray(images) || !images.length) return urls;
+
+  for (const img of images.slice(0, MAX_FILES)) {
+    try {
+      if (!img || typeof img.data !== 'string') continue;
+
+      const comma = img.data.indexOf(',');
+      const b64 = comma >= 0 ? img.data.slice(comma + 1) : img.data;
+      const buf = Buffer.from(b64, 'base64');
+
+      if (!buf.length || buf.length > MAX_BYTES) continue;
+
+      const sig = sniff(buf);   // validate ACTUAL BYTES, not the claimed type
+      if (!sig) continue;
+
+      const file = await stripe.files.create({
+        purpose: 'business_logo',   // generic image purpose; accepts png/jpg/gif/webp
+        file: {
+          data: buf,
+          name: `concept.${sig.ext}`,
+          type: sig.mime
+        }
+      });
+
+      const link = await stripe.fileLinks.create({ file: file.id });
+      if (link.url) urls.push(link.url);
+
+    } catch (err) {
+      console.error('Concept image skipped:', err.message);
+      // keep going — one bad image must not kill the order
+    }
+  }
+  return urls;
+}
+
 exports.handler = async (event) => {
   // Only POST. Anything else is noise.
   if (event.httpMethod !== 'POST') {
@@ -35,7 +96,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Invalid request.' }) };
   }
 
-  const { bundleKey, name, email, details, timeline, termsAccepted, conceptKeys } = payload;
+  const { bundleKey, name, email, details, timeline, termsAccepted, images } = payload;
 
   // --- Validate the bundle against the server catalog ---
   const item = getBundle(bundleKey);
@@ -70,6 +131,10 @@ exports.handler = async (event) => {
 
   const siteUrl = process.env.URL || 'https://nilciphersystems.com';
 
+  // Upload concept images to Stripe. Failures are swallowed inside — a bad
+  // mockup never blocks a paying customer.
+  const imageUrls = await uploadImages(images);
+
   try {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -100,7 +165,7 @@ exports.handler = async (event) => {
         customer_name: clip(name, 200),
         project_details: clip(details, 480),
         timeline: clip(timeline, 100),
-        concept_images: Array.isArray(conceptKeys) ? conceptKeys.slice(0, 5).join(',') : '',
+        concept_images: imageUrls.join(' | ').slice(0, 480),
         terms_accepted: 'yes',
         terms_accepted_at: new Date().toISOString()
       },

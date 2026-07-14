@@ -99,39 +99,31 @@ function shell(bannerColor, bannerText, rows, extra = '') {
 </body></html>`;
 }
 
-/** An UNPAID lead — they filled the form. They have NOT paid yet. */
+/**
+ * A CUSTOM QUOTE REQUEST — no fixed price, so no deposit was taken.
+ * This is the ONLY notification you'll get for these, so it must never be missed.
+ * (Bundle orders that get abandoned send nothing — the PAID email covers those.)
+ */
 async function sendLeadEmail(o) {
-  const isCustom = o.service === 'Custom';
-
   const rows = [
-    ['Status', isCustom
-      ? '<span style="color:#b45309">CUSTOM QUOTE REQUEST — no deposit taken</span>'
-      : '<span style="color:#b91c1c">UNPAID — deposit NOT yet confirmed</span>'],
+    ['Status', '<span style="color:#b45309">CUSTOM QUOTE REQUEST — no deposit taken</span>'],
     ['Client', esc(o.name)],
-    ['Email', esc(o.email)],
-    ['Service', esc(o.service)]
+    ['Email', esc(o.email)]
   ];
-  if (!isCustom) {
-    rows.push(['Bundle', esc(o.bundle)]);
-    rows.push(['Deposit due', esc(o.deposit)]);
-  }
   if (o.timeline) rows.push(['Timeline', esc(o.timeline)]);
-  rows.push(['Brief', esc(o.details).replace(/\n/g, '<br>') || '<em>none given</em>']);
+  rows.push(['What they want', esc(o.details).replace(/\n/g, '<br>') || '<em>nothing written</em>']);
 
-  const warn = isCustom ? '' : `
-    <div style="margin:0;padding:14px 22px;background:#fef2f2;
-                border-top:1px solid #fecaca;color:#991b1b;font-size:13px">
-      <strong>Do not start work on this yet.</strong> This email fires when
-      someone submits the form &mdash; before payment. They may still abandon
-      checkout. You'll get a separate <strong>DEPOSIT PAID</strong> email when
-      the money actually clears. Check Stripe if unsure.
+  const cta = `
+    <div style="margin:0;padding:14px 22px;background:#fffbeb;
+                border-top:1px solid #fde68a;color:#92400e;font-size:13px">
+      <strong>They can't pay until you quote them.</strong> There's no bundle price
+      for this, so no deposit was taken and no payment page was shown. Reply to this
+      email to scope it and send them a number.
     </div>`;
 
   return sendEmail({
-    subject: isCustom
-      ? `Custom quote request — ${o.name}`
-      : `UNPAID lead — ${o.service} ${o.bundle} — ${o.name}`,
-    html: shell('#78350f', isCustom ? 'CUSTOM QUOTE REQUEST' : 'UNPAID LEAD', rows, warn),
+    subject: `Custom quote request — ${o.name}`,
+    html: shell('#78350f', 'CUSTOM QUOTE REQUEST', rows, cta),
     replyTo: o.email
   });
 }
@@ -155,12 +147,12 @@ async function sendPaidEmail(session, m) {
       : '<span style="color:#b91c1c">NOT ACCEPTED — investigate</span>']
   ];
 
-  const imgs = (m.concept_images || '').split(',').filter(Boolean);
+  const imgs = (m.concept_images || '').split(' | ').filter(Boolean);
   rows.push(['Concept images', imgs.length
-    ? `${imgs.length} attached:<br>` +
-      imgs.map(k => `<code style="font-size:12px">${esc(k)}</code>`).join('<br>') +
-      `<br><span style="color:#999;font-size:11px">In the "concepts" blob store</span>`
-    : '<em>none</em>']);
+    ? imgs.map((u, i) =>
+        `<a href="${esc(u)}" style="color:#166534">Image ${i + 1}</a>`).join(' &middot; ') +
+      `<br><span style="color:#999;font-size:11px">Hosted on Stripe — click to view</span>`
+    : '<em>none attached</em>']);
 
   const go = `
     <div style="padding:14px 22px;background:#f0fdf4;

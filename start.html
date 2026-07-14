@@ -331,7 +331,7 @@
     <h2>Start Your Build</h2>
     <p class="about-text">Tell me what you need, then pay your deposit — one step, one click.</p>
     <div class="form-wrap">
-      <form id="order-form" action="https://formspree.io/f/mojogvnd" method="POST">
+      <form id="order-form">
         <div class="form-group">
           <label for="name">Your Name</label>
           <input type="text" id="name" name="name" required>
@@ -813,19 +813,13 @@
       });
     }
 
-    async function uploadConcepts() {
+    // Images ride along with the checkout request — no separate upload endpoint.
+    // They're attached to the Stripe payment record server-side.
+    async function packImages() {
       if (!pendingFiles.length) return [];
-      const files = await Promise.all(
+      return Promise.all(
         pendingFiles.map(async f => ({ name: f.name, data: await fileToDataUrl(f) }))
       );
-      const res = await fetch('/.netlify/functions/upload-concept', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ files })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Image upload failed.');
-      return data.keys || [];
     }
     // ===== Browse =====
     function showCategory(cat, el) {
@@ -985,22 +979,22 @@
       statusEl.className = 'form-status';
 
       try {
-        // Send the brief to Formspree so the write-up is captured even if they
-        // bail at checkout. This is a LEAD, not a sale — tag it clearly so the
-        // email can never be mistaken for a paid order. The webhook is the only
-        // thing that confirms money actually moved.
-        const fd = new FormData(form);
-        fd.set('_subject', isCustom
-          ? 'CUSTOM QUOTE REQUEST — Nilcipher'
-          : `UNPAID LEAD — ${service} ${BUNDLE_LABELS[service][idx]} — Nilcipher`);
-        fd.set('payment_status', isCustom
-          ? 'N/A — custom quote, no deposit taken'
-          : 'UNPAID — deposit not yet confirmed. Check Stripe before starting work.');
-        await fetch(form.action, {
+        // Send the UNPAID lead email (via Resend, not Formspree — no 50/mo cap).
+        // Fire-and-forget: if this fails we still let them check out. A missed
+        // lead email is annoying; a blocked payment is worse. The PAID email
+        // comes from the Stripe webhook on a separate path.
+        const bundleName = isCustom ? '' : BUNDLE_LABELS[service][idx];
+        const dep = isCustom ? '' : DEPOSITS[service][idx];
+        fetch('/.netlify/functions/send-lead', {
           method: 'POST',
-          body: fd,
-          headers: { 'Accept': 'application/json' }
-        });
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name, email, details, timeline,
+            service: service,
+            bundle: bundleName,
+            deposit: dep
+          })
+        }).catch(() => {});   // never block checkout on this
 
         // Custom orders have no fixed price — no deposit, just a quote request.
         if (isCustom) {
@@ -1014,11 +1008,11 @@
           return;
         }
 
-        // Upload any concept images first, so their keys ride along with the payment.
-        let conceptKeys = [];
+        // Pack any concept images to send with the order.
+        let images = [];
         if (pendingFiles.length) {
-          submitBtn.textContent = 'Uploading images\u2026';
-          conceptKeys = await uploadConcepts();
+          submitBtn.textContent = 'Attaching images\u2026';
+          images = await packImages();
         }
 
         // Ask the SERVER to build a checkout session. We send the bundle KEY,
@@ -1034,7 +1028,7 @@
             details: details,
             timeline: timeline,
             termsAccepted: termsOk,
-            conceptKeys: conceptKeys
+            images: images
           })
         });
 
