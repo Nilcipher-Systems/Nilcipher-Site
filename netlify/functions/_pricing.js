@@ -18,188 +18,153 @@
 const CATALOG = {
   // ---------- WEBSITES ----------
   'website-starter': {
-    service: 'Website', bundle: 'Starter', total: 275, timeline: '~3-4 days',
-    summary: 'A sharp one-page site. Perfect for a portfolio or a first web presence.',
+    service: 'Website', bundle: 'Starter', total: 125, timeline: '~3 days',
+    summary: 'A clean one-page site. Portfolio, landing page, first web presence.',
     features: [
-      'Single-page responsive site (mobile, tablet, desktop)',
-      'Up to 3 content sections',
-      'Contact form wired to your email',
+      'Single-page responsive site',
+      'Up to 3 sections',
+      'Contact form to your email',
       'Deployed live with SSL',
-      'Full source code, yours to keep',
-      '1 round of revisions'
+      'Full source code',
+      '1 round of revisions',
     ]
   },
   'website-business': {
-    service: 'Website', bundle: 'Business', total: 1100, timeline: '~2.5 weeks',
-    summary: 'Everything a real business needs to operate online — including taking money.',
+    service: 'Website', bundle: 'Business', total: 300, timeline: '~1 week',
+    summary: 'A small multi-page site that can take payments.',
     features: [
       'Everything in Starter',
-      'Up to 6 distinct pages',
-      'Stripe payment integration — take card payments directly',
-      'Contact + inquiry forms routed to your inbox',
-      'Booking / appointment scheduling (if you need it)',
-      'Google Analytics + conversion tracking',
-      'Full SEO setup (meta, sitemap, schema, Google indexing)',
-      'Google Business Profile integration',
-      'Custom animations and scroll interactions',
-      'Blog or gallery system',
-      'Social media integration',
-      'Performance tuning (fast load scores)',
-      'Mobile-first responsive across every device',
-      '3 rounds of revisions'
+      'Up to 4 pages',
+      'Stripe payment button',
+      'Basic SEO setup',
+      'Analytics',
+      '2 rounds of revisions',
     ]
   },
   'website-advanced': {
-    service: 'Website', bundle: 'Advanced', total: 2200, timeline: '~4-5 weeks',
-    summary: 'When the website IS the product — accounts, dashboards, custom logic.',
+    service: 'Website', bundle: 'Advanced', total: 500, timeline: '~2 weeks',
+    summary: 'A site with real features — logins or a simple backend.',
     features: [
       'Everything in Business',
-      'Unlimited pages',
-      'Custom backend / serverless functions',
-      'User accounts, logins, and authentication',
-      'Customer dashboard — your users get their own logged-in area',
-      'Admin panel — manage content, orders, and users yourself',
-      'Database design and integration',
-      'Subscriptions and recurring billing (not just one-off payments)',
-      'Third-party API integrations (CRM, inventory, shipping, whatever you run on)',
-      'Automated emails (receipts, confirmations, reminders)',
-      'Role-based permissions (staff vs customer vs admin)',
-      'Security hardening and server-side validation',
-      'Automated testing',
-      '30 days of post-launch support',
-      'Unlimited revisions during the build'
+      'Up to 6 pages',
+      'User logins OR a simple backend',
+      'Database integration',
+      'Third-party API hookup',
+      '30 days support',
+      '3 rounds of revisions',
     ]
   },
-
   // ---------- BOTS ----------
   'bot-starter': {
-    service: 'Bot', bundle: 'Starter', total: 180, timeline: '~2-3 days',
-    summary: 'A simple bot that nails a handful of jobs.',
+    service: 'Bot', bundle: 'Starter', total: 90, timeline: '~2 days',
+    summary: 'A simple bot that does a few jobs well.',
     features: [
-      'Up to 5 custom slash commands',
-      'Core moderation (kick, ban, warn, purge)',
-      'Welcome / goodbye messages',
-      'Hosting setup guide included',
-      'Full source code, yours to keep',
-      '1 round of revisions'
+      'Up to 5 slash commands',
+      'Core moderation (kick/ban/warn)',
+      'Welcome messages',
+      'Hosting setup guide',
+      'Full source code',
+      '1 round of revisions',
     ]
   },
   'bot-standard': {
-    service: 'Bot', bundle: 'Standard', total: 700, timeline: '~1.5 weeks',
-    summary: 'A bot with a memory — logs, records, and persistent data.',
+    service: 'Bot', bundle: 'Standard', total: 240, timeline: '~4 days',
+    summary: 'A bot with a memory — records and persistent data.',
     features: [
       'Everything in Starter',
-      'Up to 20 custom slash commands',
-      'SQLite database (infractions, user records, logs)',
-      'Interactive buttons, dropdowns, and modals',
-      'Role assignment panels',
-      'Automod triggers and filters',
-      'Scheduled and recurring tasks',
-      'Logging channels for every action',
-      '3 rounds of revisions'
+      'Up to 15 commands',
+      'SQLite database',
+      'Buttons, menus, modals',
+      'Role panels',
+      'Automod',
+      '2 rounds of revisions',
     ]
   },
   'bot-premium': {
-    service: 'Bot', bundle: 'Premium', total: 1500, timeline: '~3 weeks',
-    summary: 'A full platform — tiered permissions, dashboards, external APIs.',
+    service: 'Bot', bundle: 'Premium', total: 450, timeline: '~1.5 weeks',
+    summary: 'A full bot — tiered permissions and integrations.',
     features: [
       'Everything in Standard',
       'Unlimited commands',
-      'Tiered permission system (staff ranks, access levels)',
-      'Web dashboard to configure the bot',
-      'External API integrations (Twitch, YouTube, payments, etc.)',
-      'Ticket / support system',
-      'Economy, leveling, or custom game mechanics',
-      'Multi-server support',
-      '24/7 hosting setup and deployment',
-      '30 days of post-launch support'
+      'Tiered staff permissions',
+      'External API integration',
+      'Ticket system',
+      '24/7 hosting setup',
+      '3 rounds of revisions',
     ]
   },
-
   // ---------- APPS ----------
   'app-starter': {
-    service: 'App', bundle: 'Starter', total: 400, timeline: '~1 week',
-    summary: 'A working tool that solves one problem properly.',
+    service: 'App', bundle: 'Starter', total: 150, timeline: '~3 days',
+    summary: 'A working tool that solves one problem.',
     features: [
-      'Single-purpose application (web or desktop)',
-      'Clean, functional UI',
+      'Single-purpose app (web or desktop)',
+      'Clean UI',
       'Local data storage',
-      'One core feature, built to your spec',
-      'Full source code and setup docs',
-      '1 round of revisions'
+      'Full source code + docs',
+      '1 round of revisions',
     ]
   },
   'app-standard': {
-    service: 'App', bundle: 'Standard', total: 1200, timeline: '~2.5 weeks',
-    summary: 'A real application with a backend and users.',
+    service: 'App', bundle: 'Standard', total: 325, timeline: '~1 week',
+    summary: 'A real app with a backend and users.',
     features: [
       'Everything in Starter',
       'Backend API',
-      'Database (SQLite or Postgres)',
-      'User accounts and authentication',
-      'Multi-screen interface',
-      'Third-party API integration',
-      'Deployment to live hosting',
-      '3 rounds of revisions'
+      'Database',
+      'User accounts',
+      'Deployed live',
+      '2 rounds of revisions',
     ]
   },
   'app-premium': {
-    service: 'App', bundle: 'Premium', total: 2100, timeline: '~4-5 weeks',
-    summary: 'Production-grade software. The whole thing, built properly.',
+    service: 'App', bundle: 'Premium', total: 500, timeline: '~2 weeks',
+    summary: 'A full-stack app, built properly.',
     features: [
       'Everything in Standard',
-      'Full-stack production application',
-      'Admin panel and role-based permissions',
-      'Payment processing (Stripe)',
-      'Real-time features (websockets, live updates)',
-      'Automated testing',
-      'CI/CD pipeline — push to deploy',
-      'Scalable architecture',
-      '30 days of post-launch support',
-      'Unlimited revisions during the build'
+      'Admin panel',
+      'Payment processing',
+      'Role-based permissions',
+      '30 days support',
+      '3 rounds of revisions',
     ]
   },
-
-  // ---------- AUTOMATION ----------
+  // ---------- AUTOMATIONS ----------
   'automation-starter': {
-    service: 'Automation', bundle: 'Starter', total: 125, timeline: '~1-2 days',
-    summary: 'Kill one repetitive task. The cheapest way to get your time back.',
+    service: 'Automation', bundle: 'Starter', total: 60, timeline: '~1 day',
+    summary: 'Kill one repetitive task.',
     features: [
       'Single automation script',
-      'One task automated end to end',
-      'Plain-English setup instructions',
+      'One task, end to end',
+      'Setup instructions',
       'Full source code',
-      '1 round of revisions'
+      '1 round of revisions',
     ]
   },
   'automation-standard': {
-    service: 'Automation', bundle: 'Standard', total: 450, timeline: '~1 week',
+    service: 'Automation', bundle: 'Standard', total: 180, timeline: '~4 days',
     summary: 'A multi-step workflow that runs itself.',
     features: [
       'Everything in Starter',
-      'Multi-step workflow automation',
-      'API integrations (connect your tools together)',
-      'Web scraping / data collection',
-      'Error handling and retry logic',
-      'Email or Discord notifications on completion',
-      'Run logs so you can see what happened and when',
-      '3 rounds of revisions'
+      'Multi-step workflow',
+      'API integrations',
+      'Error handling',
+      'Notifications on completion',
+      '2 rounds of revisions',
     ]
   },
   'automation-premium': {
-    service: 'Automation', bundle: 'Premium', total: 1000, timeline: '~2 weeks',
-    summary: 'A full pipeline. Set it up once, never think about it again.',
+    service: 'Automation', bundle: 'Premium', total: 375, timeline: '~1.5 weeks',
+    summary: 'A full pipeline you never think about again.',
     features: [
       'Everything in Standard',
-      'Full data pipeline (ingest, transform, store, report)',
+      'Full data pipeline',
       'Database integration',
-      'Custom dashboard to monitor runs',
-      'Cloud deployment (runs without your computer on)',
-      'Alerting and monitoring',
-      'Automated reports',
-      '30 days of post-launch support'
+      'Cloud deployment',
+      'Monitoring + alerts',
+      '30 days support',
     ]
-  }
+  },
 };
 
 const DEPOSIT_RATE = 0.25; // 25% up front, 75% on delivery
